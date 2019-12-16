@@ -3,7 +3,6 @@
    <head>
       <meta charset="UTF-8">
       <title>BruceWind's blog</title>
-      
       <!-- <link rel="stylesheet"  type="text/css"  href="https://markdowncss.github.io/modest/css/modest.css"/> -->
       <link rel="stylesheet"  type="text/css"  href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css"/>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
@@ -12,89 +11,99 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-
       <script>
-        function createCate(categr) {
-        var content_div = document.getElementById("content"); //获取组件1
-        var eleme = document.createElement("p"); //创建组件2
-        var ele_content = document.createTextNode(categr +"：");//创建节点内容
-        eleme.appendChild(ele_content); // 组件添加节点
-        content_div.appendChild(eleme); //组件2加入组件1
-      }
+         function createCate(categr) 
+         {
+          var content_div = document.getElementById("content"); //find div.
+          var eleme = document.createElement("p"); //create p tag.
+          var ele_content = document.createTextNode(categr +"：");//create text 
+          eleme.appendChild(ele_content); // insert text to <p> 
+          content_div.appendChild(eleme);
+         }
 
-        var jstring = '[{"category":"开源","data":[{"title":"Reach high security in Android","mdsource":"https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README.md","date":"2016-11-29"},{"title":"Reach high security in Android2","mdsource":"https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README.md","date":"2016-11-29"}]},{"category":"扯淡","data":[{"title":"Reach high security in Android扯淡","mdsource":"https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README.md","date":"2016-11-29"},{"title":"Reach high security in Android2扯淡","mdsource":"https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README.md","date":"2016-11-29"}]}]'
+         function renderBlogs(config_str){
 
+           var jsonData = JSON.parse(config_str);
+           for (var i = 0; i < jsonData.length; i++) {
+             var item = jsonData[i];
+             //console.log(item.category);
+             createCate(item.category);
+             if(item.data.length<1) continue;
 
-        $( document ).ready(function() {
-          
-          var jsonData = JSON.parse(jstring);
-          for (var i = 0; i < jsonData.length; i++) {
-            var item = jsonData[i];
-            console.log(item.category);
-            createCate(item.category);
-            var list= item.data;
-            if(list.length<1) continue;
-            var ul_tag_str="";
-            var ul_tag = document.createElement("ul")
-            for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
-              console.log(list[chapterIndex].title);
-              ul_tag_str = ul_tag_str + '<li>'+list[chapterIndex].date;
-              ul_tag_str = ul_tag_str +'  <a href="javascript:;" onclick="showREADME(';
-              ul_tag_str = ul_tag_str + "'"+list[chapterIndex].mdsource +"'";
-              ul_tag_str = ul_tag_str + ')")>'+list[chapterIndex].title +'</a>  ';
-              ul_tag_str = ul_tag_str +'</li>';
-            }
-            ul_tag_str = ul_tag_str + "";
-            ul_tag.innerHTML = ul_tag_str;
-            document.getElementById("content").appendChild(ul_tag)
-          }
-            
-
-        });
+             var list= item.data;
+             var ul_tag_str="";
+             var ul_tag = document.createElement("ul")
+             for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
+               console.log(list[chapterIndex].title);
+               ul_tag_str = ul_tag_str + '<li>'+list[chapterIndex].date;
+               ul_tag_str = ul_tag_str +'  <a href="javascript:;" onclick="showREADME(';
+               ul_tag_str = ul_tag_str + "'"+list[chapterIndex].mdsource +"'";
+               ul_tag_str = ul_tag_str + ')")>'+list[chapterIndex].title +'</a>  ';
+               ul_tag_str = ul_tag_str +'</li>';
+             }
+             ul_tag_str = ul_tag_str + "";
+             ul_tag.innerHTML = ul_tag_str;
+             document.getElementById("content").appendChild(ul_tag)
+           }
+         }
 
 
+         var json_source ='https://brucewind.github.io/config/config.json';
+         $( document ).ready(function() {
+          $.get(json_source, function(jstring) {renderBlogs(jstring)}, 'text')
+          .fail(function() {
+              alert("I can't read config file."); // 
+          });
+         });
+         
+         
       </script>      
-
       <script>
          function showREADME(readmeUrl) {
-
-          $("#list").LoadingOverlay("show")
-
+         
+          $("#markdown_canvas").LoadingOverlay("show")
+         
          
          $("#dialog-message").dialog({
-         	open: function(event, ui) {$(this).css({'max-height': $( window ).height(), 'overflow-y': 'auto'});},
-         	resizable: true,
+          open: function(event, ui) {$(this).css({'max-height': $( window ).height(), 'overflow-y': 'auto'});},
+          resizable: true,
                modal: true,
                width: '60%',
                position: { my: "center", at: "top" },
                show: {
                 effect: 'fade',
-                duration: 150
+                duration: 280
             },
             hide: {
                 effect: 'fade',
                 duration: 280
             },
-
+         
                buttons: {
                  Done: function() {
-                   $("#list").html("html").end();
-                   $( this ).dialog( "close" );
+                   $("#markdown_canvas").html("").end();
+                   $(this).dialog( "close" );
                  }
                }
              });
-
-
+         
+         
             $.get(readmeUrl, function(data) {
               var converter = new showdown.Converter();
-              var text      = data;  //这里可以是从输入框获取
+              var text      = data;  //
               var html      = converter.makeHtml(text);//with jquery
-              $("#list").LoadingOverlay("hide")
-         	
-         			$("#list").html(html).end();
-         			$("#dialog-message").css("display","block");
+            
+              $("#markdown_canvas").html(html).end();
+              $("#dialog-message").css("display","block");
+              $("#markdown_canvas").LoadingOverlay("hide");
          
-         		}, 'text');
+            }, 'text')
+            .fail(function() {
+              $("#dialog-message").dialog( "close" );
+              $("#markdown_canvas").LoadingOverlay("hide");
+              alert('( >﹏<。) 404... '); // 
+          });
+
          
          }
          
@@ -102,12 +111,10 @@
       </script>
    </head>
    <body>
-
       <div id="dialog-message" title="原文" style="display: none;">
-        <p></p>
-         <div id="list" class="markdown-body" ></div>
+         <p></p>
+         <div id="markdown_canvas" class="markdown-body" ></div>
       </div>
       <div id="content"></div>
-
    </body>
 </html>
