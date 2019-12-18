@@ -122,7 +122,7 @@ public class FixChildHeightGridView extends GridView {
 #  
 代码就是这样子，看最终的效果吧！
 
-![](assets/5673bbfaab6441660a003573)
+![](assets/5673bbfaab6441660a003573.PNG)
 
 #  
 目前是可以彻底解决这个问题了，那么问题来了。
