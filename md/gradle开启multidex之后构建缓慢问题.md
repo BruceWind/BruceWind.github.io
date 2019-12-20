@@ -111,7 +111,7 @@ org.gradle.jvmargs = -Xmx2048m
 
 ## 8.忽略配置直接命令行编译
 ```
-./gradlew assembleDebug --parallel --max-workers=6   -PminSdk=21
+./gradlew assembleDebug  -x lint  --parallel --max-workers=6   -PminSdk=21
 ```
 
 
