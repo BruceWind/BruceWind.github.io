@@ -5,10 +5,10 @@ categories:
 - 技术
 ---
 由于各种不可描述的原因境内下载很慢。
-大概氛围一个是 gradle目录的gradle-xxxx-all.zip下载慢，和依赖的aar,jar下载慢这两块。
+本文是围绕gradle目录的gradle-xxxx-all.zip下载慢，和依赖的aar,jar下载慢这两块。linux或mac环境，windows用户不用看下去了。
 
 
-## 一.直接代理(linux或mac)
+## 一.直接代理
 
 > + 合格大陆程序员一定要有代理，没有代理的二流程序员请跳过这部分：
 
@@ -34,7 +34,7 @@ systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
 你项目根目录的配置文件**gradle.properties**也可以拷贝这个进行配置。
 
 
-# 二.没有代理下载和配置gradle-xxxx-all.zip的优化方案：
+# 二.下载和配置gradle-xxxx-all.zip(无代理)：
 ###1.下载 
 首先使用多线程下载解决您从国内下载缓慢的问题,你可以用各种多线程下载器进行下载，或者找国内的别人下载好上传多国内服务器的文件。
 
@@ -44,7 +44,7 @@ systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
 ### 2.本机配置gradle环境
 拿到这个gradle的zip文件，下载好了解压出来到任意一个位置，然后再配置环境变量。
 设置环境变量：
-我是mac 我需要这样子来配置，在终端输入以管理员的权限打开.bash_profile文件命令：
+我是mac我需要这样子来配置，在终端输入以管理员的权限打开.bash_profile文件命令：
 ```sudo vim ~/.bash_profile```
 
     GRADE_HOME=/..../gradle2.2.1;
@@ -63,11 +63,12 @@ systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
 ```distributionUrl=gradle-2.2.1-all.zip```
 之后就可以在idea或者as中rebuild一下即可。这里就可以跳过下载gradle的过程，继续下载依赖的jcenter代码库了。
 
-# 三.没有代理解决依赖的aar,jar下载慢
+# 三.解决依赖的aar,jar下载慢(无代理)
 
 ### 1.依赖的aar,jar等下载缓慢时走国内镜像：
 
 ```
+//该方案不能解决所有依赖，可能当前仓库部分的依赖是aliyun里没有的。
 allProjects {
     repositories {
         maven { url 'https://maven.aliyun.com/repository/public/' }
