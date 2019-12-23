@@ -13,7 +13,7 @@ categories:
 > + 合格大陆程序员一定要有代理，没有代理的二流程序员请跳过这部分：
 
 ### 1.命令行下所有的http(s)请求加代理（不止gradle命令）
-推荐使用别名加如到**~/.bashrc**最后一行，这样子当你需要下载各种东西的时候都非常方便。
+推荐使用别名加如到**~/.bashrc**最后一行，这样子当你需要下载各种东西的时候用别名代替输入这行字符串非常方便。
 ```
 alias proxyterminal='export http_proxy=http://127.0.0.1:1080;export https_proxy=http://127.0.0.1:1080;'
 ```
@@ -55,10 +55,12 @@ systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
 
 查看gradle是否配置成功命令：gradle -version，若成功输出gradle版本的一些东西。
 
+还有个方案：
+下载好丢到~/.gradle/wrapper/dists这个目录里，再重启as，或者命令行重新编译。
 # 
 
-### 2.懒得配置环境，保存到项目根目录进行编译
-你保存到当前project根目录,/project/gradle/wrapper下,
+### 3.懒得配置环境，保存到项目根目录进行编译
+你保存到当前project根目录,/project/gradle/wrapper/下,
 并且修改**gradle-wrapper.properties**文件。
 ```distributionUrl=gradle-2.2.1-all.zip```
 之后就可以在idea或者as中rebuild一下即可。这里就可以跳过下载gradle的过程，继续下载依赖的jcenter代码库了。
@@ -71,8 +73,10 @@ systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
 //该方案不能解决所有依赖，可能当前仓库部分的依赖是aliyun里没有的。
 allProjects {
     repositories {
-        maven { url 'https://maven.aliyun.com/repository/public/' }
-        maven { url 'https://maven.aliyun.com/repository/spring/'}
+		maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+
         mavenLocal()
         mavenCentral()
     }
