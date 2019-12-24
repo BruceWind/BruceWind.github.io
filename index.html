@@ -22,6 +22,9 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
       <link rel="stylesheet"  type="text/css"  href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css"/>
+
+
+
       <script>
          function createCate(categr) 
          {
@@ -45,7 +48,7 @@
              var ul_tag_str="";
              var ul_tag = document.createElement("ul")
              for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
-               console.log(list[chapterIndex].title);
+               //console.log(list[chapterIndex].title);
                ul_tag_str = ul_tag_str + '<li>'+list[chapterIndex].date;
                ul_tag_str = ul_tag_str +'  <a href="javascript:;" onclick="showREADME(';
                ul_tag_str = ul_tag_str + "'"+list[chapterIndex].mdsource +"'";
@@ -59,7 +62,7 @@
          }
 
 
-         var json_source ='https://brucewind.github.io/config/config.json';
+         var json_source ='config/config.json';
          $( document ).ready(function() {
           $.get(json_source, function(jstring) {renderBlogs(jstring)}, 'text')
           .fail(function() {
@@ -98,12 +101,18 @@
                }
              });
          
-         
+         	$("#dialog-message").title ='原文';
             $.get(readmeUrl, function(data) {
+            	//get title.
+              var title_str = data.substr(data.indexOf('title:') + 6,data.indexOf('\n')-data.indexOf('title: ')-6);
+              console.log(title_str);
+             
+              //render content.
               var converter = new showdown.Converter();
               var text      = data;  //
               var html      = converter.makeHtml(text);//with jquery
-            
+
+			
               $("#markdown_canvas").html(html).end();
               $("#dialog-message").css("display","block");
               $("#markdown_canvas").LoadingOverlay("hide");
@@ -122,6 +131,19 @@
       </script>
    </head>
    <body>
+   	
+<!-- Google Analytics begin-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-154968875-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-154968875-1');
+</script>
+<!-- Google Analytics end-->
+
+
       <div id="dialog-message" title="原文" style="display: none;">
          <p></p>
          <div id="markdown_canvas" class="markdown-body" ></div>
