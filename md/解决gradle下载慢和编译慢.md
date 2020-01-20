@@ -1,9 +1,92 @@
-title: gradle开启multidex之后构建缓慢问题
-date: 2016/04/25 12:48:53
-updated: 2017/03/23 15:56:37
+title: 解决gradle下载慢和编译慢
+date: 2016/03/05 23:37:38
+updated: 2016/03/06 09:13:18
 categories:
 - 技术
 ---
+由于各种不可描述的原因境内下载很慢。
+本文是围绕gradle目录的gradle-xxxx-all.zip下载慢，和依赖的aar,jar下载慢这两块。linux或mac环境，windows用户不用看下去了。
+
+
+## 一.直接代理
+
+> + 合格大陆程序员一定要有代理，没有代理的二流程序员请跳过这部分：
+
+### 1.命令行下所有的http(s)请求加代理（不止gradle命令）
+推荐使用别名加如到**~/.bashrc**最后一行，这样子当你需要下载各种东西的时候用别名代替输入这行字符串非常方便。
+```
+alias proxyterminal='export http_proxy=http://127.0.0.1:1080;export https_proxy=http://127.0.0.1:1080;'
+```
+### 2.给gradle命令编译配置独立的http代理：
+编辑**~/.gradle/gradle.properties**:
+
+```
+//cat ~/.gradle/gradle.properties
+systemProp.http.proxyHost=127.0.0.1
+systemProp.http.proxyPort=1080
+
+systemProp.https.proxyPort=1080
+systemProp.https.proxyHost=127.0.0.1
+
+systemProp.http.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
+systemProp.https.nonProxyHosts=*.cn|localhost|*.aliyun.com|172.*|10.23*|192.168*
+```
+你项目根目录的配置文件**gradle.properties**也可以拷贝这个进行配置。
+
+
+# 二.下载和配置gradle-xxxx-all.zip(无代理)：
+###1.下载 
+首先使用多线程下载解决您从国内下载缓慢的问题,你可以用各种多线程下载器进行下载，或者找国内的别人下载好上传多国内服务器的文件。
+
+
+# 
+
+### 2.本机配置gradle环境
+拿到这个gradle的zip文件，下载好了解压出来到任意一个位置，然后再配置环境变量。
+设置环境变量：
+我是mac我需要这样子来配置，在终端输入以管理员的权限打开.bash_profile文件命令：
+```sudo vim ~/.bash_profile```
+
+    GRADE_HOME=/..../gradle2.2.1;
+     export GRADE_HOME
+     export PATH=/opt/local/bin:/opt/local/sbin:$PATH:$GRADE_HOME/bin
+
+保存.bash_profile文件后执行source ~/.bash_profile
+
+查看gradle是否配置成功命令：gradle -version，若成功输出gradle版本的一些东西。
+
+还有个方案：
+下载好丢到~/.gradle/wrapper/dists这个目录里，再重启as，或者命令行重新编译。
+# 
+
+### 3.懒得配置环境，保存到项目根目录进行编译
+你保存到当前project根目录,/project/gradle/wrapper/下,
+并且修改**gradle-wrapper.properties**文件。
+```distributionUrl=gradle-2.2.1-all.zip```
+之后就可以在idea或者as中rebuild一下即可。这里就可以跳过下载gradle的过程，继续下载依赖的jcenter代码库了。
+
+# 三.解决依赖的aar,jar下载慢(无代理)
+
+### 1.依赖的aar,jar等下载缓慢时走国内镜像：
+
+```
+//该方案不能解决所有依赖，可能当前仓库部分的依赖是aliyun里没有的。
+allProjects {
+    repositories {
+		maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+
+        mavenLocal()
+        mavenCentral()
+    }
+}
+//这里没有google的镜像，主要google在我这边测试速度还挺快，应该他们自己弄了国内的节点。
+```
+
+gradle开启multidex之后构建缓慢问题
+-------
+
 项目越来越大，导入各种第三方的包，导致项目java方法数很轻松超过64K，那么gradle构建就会轻易的进入到一种很蛋疼的境地，直接报错  `/user/jdk/bin/.....  exit 2.`
 那么解决方案只有一个就是 开启mutidex，multidex就会带来构建缓慢的问题。
 就算我们开发本机有jcenter，maven库和gradle缓存，依旧是构建很慢。
@@ -39,9 +122,8 @@ ssd主要是解决构建大量的IO的问题。
 ```
 minSdkVersion 设置为 Android API 级别 21 的调试应用。这些设置会使 Android Gradle 插件执行以下操作：
 
-> + 将应用的每个模块（包括依赖项）构建为单独的 dex 文件。这通常称为预先 dexing。
+> + 每个子模块构建为单独的dex文件。不再做合并操作。因此可以避免为确定主 dex 文件的内容而进行长时间的计算。
 > + 将每个 dex 文件加入 APK 时不做任何修改。
-> + 最重要的是，模块 dex 文件将不执行合并操作，因此可以避免为确定主 dex 文件的内容而进行长时间的计算。
 
 不过这个方案的弊端就是：
 如果开发机 SDKVersion 没到 21 就跑不起来了；
@@ -110,9 +192,13 @@ org.gradle.jvmargs = -Xmx2048m
 
 注意：如果Gradle守护程序已经运行，则需要在使用新设置进行初始化之前停止该进程。您可以通过选择View> Tool Windows> Terminal终止并输入以下命令来终止Gradle守护程序：gradlew --stop。
 
+## 8.忽略配置直接命令行编译
+```
+./gradlew assembleDebug  -x lint  --parallel --max-workers=6   -PminSdk=21
+```
 
 
-## 8.解决由开启了multidex带来的app性能下降的问题
+## 9.解决由开启了multidex带来的app性能下降的问题
 
 
 前面说了一些编译器的问题解决，但是终究apk的性能问题还是丢在这里没人过问
@@ -129,7 +215,4 @@ TurboDex 就是为了解决这一问题而生, 就像是给AndroidVM开启了上
 
     编译的速度本来知识一个舒服不舒服的问题，不影响开发的。但是，遇到一点不舒服，都不要妥协，总有方案，让你很舒服的开发。用心去研究，努力去找方案，终究你可以自豪的地说，一个很大的项目，构建速度也一样不输ios的构建速度。
 
-----------------
-拓展阅读：
-http://developer.android.com/tools/building/multidex.html
-https://developer.android.google.cn/studio/build/optimize-your-build.html
+

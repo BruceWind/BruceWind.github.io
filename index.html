@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +11,7 @@
   <meta name="googlebot" content="index,follow" />
   <meta name="verify" content="index,follow" />
   <meta name="author" content="bruce">
+  <link rel="icon" href="favicon.ico">
   <title>BruceWind's blog</title>
   
       <!-- <link rel="stylesheet"  type="text/css"  href="https://markdowncss.github.io/modest/css/modest.css"/> -->
@@ -21,6 +22,19 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
       <link rel="stylesheet"  type="text/css"  href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css"/>
+
+<style>
+#promotion{
+position:absolute;
+right:20px;
+top:20px;
+width:450px;
+  border-radius: 10px;
+  border: 2px solid #36A04F;
+  padding: 10px;
+}
+</style>
+
       <script>
          function createCate(categr) 
          {
@@ -44,7 +58,7 @@
              var ul_tag_str="";
              var ul_tag = document.createElement("ul")
              for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
-               console.log(list[chapterIndex].title);
+               //console.log(list[chapterIndex].title);
                ul_tag_str = ul_tag_str + '<li>'+list[chapterIndex].date;
                ul_tag_str = ul_tag_str +'  <a href="javascript:;" onclick="showREADME(';
                ul_tag_str = ul_tag_str + "'"+list[chapterIndex].mdsource +"'";
@@ -58,7 +72,7 @@
          }
 
 
-         var json_source ='https://brucewind.github.io/config/config.json';
+         var json_source ='config/config.json';
          $( document ).ready(function() {
           $.get(json_source, function(jstring) {renderBlogs(jstring)}, 'text')
           .fail(function() {
@@ -97,12 +111,18 @@
                }
              });
          
-         
+         	$("#dialog-message").title ='原文';
             $.get(readmeUrl, function(data) {
+            	//get title.
+              var title_str = data.substr(data.indexOf('title:') + 6,data.indexOf('\n')-data.indexOf('title: ')-6);
+              console.log(title_str);
+             
+              //render content.
               var converter = new showdown.Converter();
               var text      = data;  //
               var html      = converter.makeHtml(text);//with jquery
-            
+
+			
               $("#markdown_canvas").html(html).end();
               $("#dialog-message").css("display","block");
               $("#markdown_canvas").LoadingOverlay("hide");
@@ -121,10 +141,61 @@
       </script>
    </head>
    <body>
+   	
+<!-- Google Analytics begin-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-154968875-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-154968875-1');
+</script>
+<!-- Google Analytics end-->
+
+
       <div id="dialog-message" title="原文" style="display: none;">
          <p></p>
          <div id="markdown_canvas" class="markdown-body" ></div>
       </div>
       <div id="content"></div>
+
+
+
+      <div id="promotion">
+        <p>邀您来买[质好价优]的产品：</p>
+        <ul>
+          <li>
+            <a href="https://www.namesilo.com/?rid=3dbf599sf"  target="_blank">{不到1美元的域名}.xyz/.top/.club/.icu等</a>
+          </li>
+
+          <li>
+            <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{3.99刀每月}亚洲优化CN②线路∨PS,ping值稳定,丢包低</a>
+          </li>
+
+          <li>
+            <a href="https://my.racknerd.com/aff.php?aff=234" target="_blank">{22刀每年}稳定CN②线路∨PS,超便宜</a>
+          </li>
+
+          <li>
+            <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{45刀每年}高阶CN② GIA线路∨PS,更快更稳定</a>
+          </li>
+
+          <li>
+            <a href="https://billing.raksmart.com/whmcs/aff.php?aff=2690" target="_blank">{低至7刀每月}超优质国际线路服务器租赁</a>
+          </li>
+        </ul>
+
+
+        <p>邀您来赚钱：</p>
+        <ul>
+          <li>
+            <a href="https://provider.fluidstack.io/#ref=dd7SgQCp1u"  target="_blank">用自己24小时工作的服务器出租带宽</a>
+          </li>
+        </ul>
+      </div>
+
+
+
    </body>
 </html>
