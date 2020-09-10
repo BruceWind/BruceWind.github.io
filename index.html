@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,182 +14,220 @@
   <meta name="author" content="bruce">
   <link rel="icon" href="favicon.ico">
   <title>BruceWind's blog</title>
-  
-      <!-- <link rel="stylesheet"  type="text/css"  href="https://markdowncss.github.io/modest/css/modest.css"/> -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="text/javascript"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
-      <link rel="stylesheet"  type="text/css"  href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css"/>
 
-<style>
-#promotion{
-position:absolute;
-right:20px;
-top:20px;
-width:450px;
-  border-radius: 10px;
-  border: 2px solid #36A04F;
-  padding: 10px;
-}
-</style>
+  <!-- <link rel="stylesheet"  type="text/css"  href="https://markdowncss.github.io/modest/css/modest.css"/> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css" />
 
-      <script>
-         function createCate(categr) 
-         {
-          var content_div = document.getElementById("content"); //find div.
-          var eleme = document.createElement("p"); //create p tag.
-          var ele_content = document.createTextNode(categr +"：");//create text 
-          eleme.appendChild(ele_content); // insert text to <p> 
-          content_div.appendChild(eleme);
-         }
+  <style> 
+    body {
+      background-color: #f0f0f0;
+    }
+    li{ 
+      color:#666;
+     }
+    #promotion {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 450px;
+      border-radius: 10px;
+      border: 2px solid #36A04F;
+      padding: 10px;
+    }
+  </style>
 
-         function renderBlogs(config_str){
-
-           var jsonData = JSON.parse(config_str);
-           for (var i = 0; i < jsonData.length; i++) {
-             var item = jsonData[i];
-             //console.log(item.category);
-             createCate(item.category);
-             if(item.data.length<1) continue;
-
-             var list= item.data;
-             var ul_tag_str="";
-             var ul_tag = document.createElement("ul")
-             for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
-               //console.log(list[chapterIndex].title);
-               ul_tag_str = ul_tag_str + '<li>'+list[chapterIndex].date;
-               ul_tag_str = ul_tag_str +'  <a href="javascript:;" onclick="showREADME(';
-               ul_tag_str = ul_tag_str + "'"+list[chapterIndex].mdsource +"'";
-               ul_tag_str = ul_tag_str + ')")>'+list[chapterIndex].title +'</a>  ';
-               ul_tag_str = ul_tag_str +'</li>';
-             }
-             ul_tag_str = ul_tag_str + "";
-             ul_tag.innerHTML = ul_tag_str;
-             document.getElementById("content").appendChild(ul_tag)
-           }
-         }
-
-
-         var json_source ='config/config.json';
-         $( document ).ready(function() {
-          $.get(json_source, function(jstring) {renderBlogs(jstring)}, 'text')
-          .fail(function() {
-              alert("I can't read config file."); // 
-          });
-         });
-         
-         
-      </script>      
-      <script>
-         function showREADME(readmeUrl) {
-         
-          $("#markdown_canvas").LoadingOverlay("show")
-         
-         
-         $("#dialog-message").dialog({
-          open: function(event, ui) {$(this).css({'max-height': $( window ).height(), 'overflow-y': 'auto'});},
-          resizable: true,
-               modal: true,
-               width: '60%',
-               position: { my: "center", at: "top" },
-               show: {
-                effect: 'fade',
-                duration: 280
-            },
-            hide: {
-                effect: 'fade',
-                duration: 280
-            },
-         
-               buttons: {
-                 Done: function() {
-                   $("#markdown_canvas").html("").end();
-                   $(this).dialog( "close" );
-                 }
-               }
-             });
-         
-         	$("#dialog-message").title ='原文';
-            $.get(readmeUrl, function(data) {
-            	//get title.
-              var title_str = data.substr(data.indexOf('title:') + 6,data.indexOf('\n')-data.indexOf('title: ')-6);
-              console.log(title_str);
-             
-              //render content.
-              var converter = new showdown.Converter();
-              var text      = data;  //
-              var html      = converter.makeHtml(text);//with jquery
-
-			
-              $("#markdown_canvas").html(html).end();
-              $("#dialog-message").css("display","block");
-              $("#markdown_canvas").LoadingOverlay("hide");
-         
-            }, 'text')
-            .fail(function() {
-              $("#dialog-message").dialog( "close" );
-              $("#markdown_canvas").LoadingOverlay("hide");
-              alert('( >﹏<。) 404... '); // 
-          });
-
-         
-         }
-         
-         
-      </script>
-   </head>
-   <body>
-   	
-<!-- Google Analytics begin-->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-154968875-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-154968875-1');
-</script>
-<!-- Google Analytics end-->
-
-
-      <div id="dialog-message" title="原文" style="display: none;">
-         <p></p>
-         <div id="markdown_canvas" class="markdown-body" ></div>
-      </div>
-      <div id="content"></div>
+  <script>
 
 
 
-      <div id="promotion">
-        <p>邀您来买[质好价优]的产品：</p>
-        <ul>
-          <li>
-            <a href="https://www.namesilo.com/?rid=3dbf599sf"  target="_blank">{不到1美元的域名}.xyz/.top/.club/.icu等</a>
-          </li>
 
-          <li>
-            <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{3.99刀每月}亚洲优化CN②线路∨PS,ping值稳定,丢包低</a>
-          </li>
+    function createCate(categr) {
+      var content_div = document.getElementById("content"); //find div.
+      var eleme = document.createElement("p"); //create p tag.
+      var ele_content = document.createTextNode(categr + "：");//create text 
+      eleme.appendChild(ele_content); // insert text to <p> 
+      content_div.appendChild(eleme);
+    }
 
-          <li>
-            <a href="https://my.racknerd.com/aff.php?aff=234" target="_blank">{22刀每年}稳定CN②线路∨PS,超便宜</a>
-          </li>
+    function renderBlogs(config_str) {
 
-          <li>
-            <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{45刀每年}高阶CN② GIA线路∨PS,更快更稳定</a>
-          </li>
+      var jsonData = JSON.parse(config_str);
+      for (var i = 0; i < jsonData.length; i++) {
+        var item = jsonData[i];
+        //console.log(item.category);
+        createCate(item.category);
+        if (item.data.length < 1) continue;
 
-          <li>
-            <a href="https://billing.raksmart.com/whmcs/aff.php?aff=2690" target="_blank">{低至7刀每月}超优质国际线路服务器租赁</a>
-          </li>
-        </ul>
+        var list = item.data;
+        var ul_tag_str = "";
+        var ul_tag = document.createElement("ul")
+        for (var chapterIndex = 0; chapterIndex < list.length; chapterIndex++) {
+          //console.log(list[chapterIndex].title);
+          ul_tag_str = ul_tag_str + '<li>' + list[chapterIndex].date;
+          ul_tag_str = ul_tag_str + '  <a href="javascript:;" onclick="showREADME(';
+          ul_tag_str = ul_tag_str + "'" + list[chapterIndex].mdsource + "'";
+          ul_tag_str = ul_tag_str + ')")>' + list[chapterIndex].title + '</a>  ';
+          ul_tag_str = ul_tag_str + '</li>';
+        }
+        ul_tag_str = ul_tag_str + "";
+        ul_tag.innerHTML = ul_tag_str;
+        document.getElementById("content").appendChild(ul_tag)
+      }
+    }
 
-      </div>
+
+    var json_source = 'config/config.json';
+    $(document).ready(function () {
+      $.get(json_source, function (jstring) { renderBlogs(jstring) }, 'text')
+        .fail(function () {
+          alert("I can't read config file."); // 
+        });
+    });
+
+
+  </script>
+  <script>
+    function showREADME(readmeUrl) {
+
+      $("#markdown_canvas").LoadingOverlay("show")
+
+
+      $("#dialog-message").dialog({
+        open: function (event, ui) { $(this).css({ 'max-height': $(window).height(), 'overflow-y': 'auto' }); },
+        resizable: true,
+        modal: true,
+        width: '60%',
+        position: { my: "center", at: "top" },
+        show: {
+          effect: 'fade',
+          duration: 280
+        },
+        hide: {
+          effect: 'fade',
+          duration: 280
+        },
+
+        buttons: {
+          Done: function () {
+            $("#markdown_canvas").html("").end();
+            $(this).dialog("close");
+          }
+        }
+      });
+
+      $("#dialog-message").title = '原文';
+      $.get(readmeUrl, function (data) {
+        //get title.
+        var title_str = data.substr(data.indexOf('title:') + 6, data.indexOf('\n') - data.indexOf('title: ') - 6);
+        console.log(title_str);
+
+        //render content.
+        var converter = new showdown.Converter();
+        var text = data;  //
+        var html = converter.makeHtml(text);//with jquery
+
+
+        $("#markdown_canvas").html(html).end();
+        $("#dialog-message").css("display", "block");
+        $("#markdown_canvas").LoadingOverlay("hide");
+
+      }, 'text')
+        .fail(function () {
+          $("#dialog-message").dialog("close");
+          $("#markdown_canvas").LoadingOverlay("hide");
+          alert('( >﹏<。) 404... '); // 
+        });
+
+
+    }
+
+
+  </script>
+</head>
+
+<body>
+
+  <!-- Google Analytics begin-->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154968875-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-154968875-1');
+
+    javascript: (function () {
+      let matched_dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (!matched_dark) {
+        return;
+      }
+      var css = 'html {-webkit-filter: invert(100%);' + '-moz-filter: invert(100%);' + '-o-filter: invert(100%);' + '-ms-filter: invert(100%); }';
+      var head = document.getElementsByTagName('head')[0];
+      var style = document.createElement('style');
+      if (!window.counter) {
+        window.counter = 1;
+      } else {
+        window.counter++;
+        if (window.counter % 2 == 0) {
+          var css = 'html {-webkit-filter: invert(0%); -moz-filter: invert(0%); -o-filter: invert(0%); -ms-filter: invert(0%); }'
+        }
+      }
+      style.type = 'text/css';
+      if (style.styleSheet) {
+        style.styleSheet.cssText = css;
+      } else {
+        style.appendChild(document.createTextNode(css));
+      }
+      head.appendChild(style);
+    }());
+  </script>
+  <!-- Google Analytics end-->
+
+
+  <div id="dialog-message" title="原文" style="display: none;">
+    <p></p>
+    <div id="markdown_canvas" class="markdown-body"></div>
+  </div>
+  <div id="content"></div>
 
 
 
-   </body>
+  <div id="promotion">
+    <p>邀您来买[质好价优]的产品：</p>
+    <ul>
+      <li>
+        <a href="https://www.namesilo.com/?rid=3dbf599sf" target="_blank">{不到1美元的域名}.xyz/.top/.club/.icu等</a>
+      </li>
+
+      <li>
+        <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{3.99刀每月}亚洲优化CN②线路∨PS,ping值稳定,丢包低</a>
+      </li>
+
+      <li>
+        <a href="https://my.racknerd.com/aff.php?aff=234" target="_blank">{22刀每年}稳定CN②线路∨PS,超便宜</a>
+      </li>
+
+      <li>
+        <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{45刀每年}高阶CN② GIA线路∨PS,更快更稳定</a>
+      </li>
+
+      <li>
+        <a href="https://billing.raksmart.com/whmcs/aff.php?aff=2690" target="_blank">{低至7刀每月}超优质国际线路服务器租赁</a>
+      </li>
+    </ul>
+
+  </div>
+
+
+
+</body>
+
 </html>
