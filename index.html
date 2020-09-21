@@ -26,13 +26,15 @@
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css" />
 
-  <style> 
+  <style>
     body {
       background-color: #f0f0f0;
     }
-    li{ 
-      color:#666;
-     }
+
+    li {
+      color: #666;
+    }
+
     #promotion {
       position: absolute;
       right: 20px;
@@ -41,12 +43,42 @@
       border-radius: 10px;
       border: 2px solid #36A04F;
       padding: 10px;
+      display: none;
     }
   </style>
 
   <script>
 
+    function needShowAds() {
 
+      var ua = navigator.userAgent.toLocaleLowerCase();
+      var browserType = null;
+      if (ua.match(/msie/) != null || ua.match(/trident/) != null) {
+        return false;
+      } else if (ua.match(/bidubrowser/) != null) {
+        return false;
+      } else if (ua.match(/metasr/) != null) {
+        return false;
+      } else if (ua.match(/tencenttraveler/) != null || ua.match(/qqbrowse/) != null) {
+        return false;
+      } else if (ua.match(/maxthon/) != null) {
+        return false;
+      }
+
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      if (/QIHU|360SE/i.test(userAgent)) {
+        return false;
+      }
+      if (/android/i.test(userAgent)) {
+        return false;
+      }
+      if (/iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return false;
+      }
+
+      return true;
+    }
 
 
     function createCate(categr) {
@@ -86,10 +118,15 @@
 
     var json_source = 'config/config.json';
     $(document).ready(function () {
+      
       $.get(json_source, function (jstring) { renderBlogs(jstring) }, 'text')
         .fail(function () {
-          alert("I can't read config file."); // 
+          alert("I can't get blogs."); // 
         });
+
+        if(needShowAds()){
+          $('#promotion').show();
+        }
     });
 
 
