@@ -12,6 +12,11 @@ categories:
 ### solution: 
 修改runner主机的DNS，让内网DNS作为first，阿里dns作为second.
 
+如果你不想修改DNS可以尝试修改hosts：
+
+登陆到你的docker container中，然后再尝试修改 hosts:
+
+```docker exec -it <container_id_or_name> bash```
 
 
 ### 2.docker注册到gitlab服务器上如何删除。
@@ -21,7 +26,7 @@ categories:
 如果是Specific runner，可以在项目的CI设置页面直接删除。如果是share runner,可能你不一定有gitlab权限。只能用docker命令去unregister.
 
 
-### 3.较低版本的gitlab服务器该选择哪个版本的docker镜像？
+### 3.gitlab服务器上的gitlab版本较低的话，该选择哪个版本的docker镜像？
 
 ### answer:
 
