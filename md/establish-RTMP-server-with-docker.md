@@ -7,15 +7,16 @@ categories:
 
 In the past, I used to [establish a RTMP stream server](https://www.cameraremote.de/how-to-setup-a-rtmp-streaming-server-on-raspberry-pi-e-g-for-gopro-cameras/) on a Raspbery PI.
 
-Obviously Raspberry PI is small in your workbench，but you still need to give it litter space and a electric charge, 
-may the action disturbs your working. 
+Obviously Raspberry PI is small in your workbench，but you still need to give it little space and a electric charge.
+May the action disturbs your working. 
 
 And now using docker is easy to establish RTMP server.
 
-> There are some steps to establish it:
+> There are several docker images to establish it on docker:
 
+## nginx-rtmp image
 
-## docker pull & run it.
+**docker pull & run it.**
 
 ``` shell script
 docker pull tiangolo/nginx-rtmp
@@ -35,13 +36,15 @@ docker run -d -p 80:80 -p 1935:1935 --name nginx-hls tiangolo/nginx-rtmp # bind 
 It is over in the event that you don't want play a HLS url.
 
 
-## HLS live stream test(has transcoding)
+## nginx-hls 
+
+> It has HLS live stream (and has transcoding)
 
 In case you wanting HLS live url, modify  conf: `vi /etc/nginx/nginx.conf` :
 
-before it run : `docker exec -it nginx-hls bash` to enter docker sytem.
-```
+Before run it, execute: `docker exec -it nginx-hls bash` to enter docker system.
 
+``` 
 worker_processes  auto;
 events {
     worker_connections  1024;
@@ -114,13 +117,38 @@ http {
 ```
 
 
-### The url you can push stream into：
+** The url you can push stream into：**
 
-has transcoding：
+With transcoding：
 `rtmp://localhost/show/live_hd720` , you can replace ***live_{low|mid|hd720}***
 
-no transcoding：`rtmp://localhost/show/live`
+No transcoding：`rtmp://localhost/show/live`
 
-### the HLS url you try to play：
+**the HLS url you try to play：**
 
 `http://localhost/hls/live.m3u8`
+
+
+## [ossrs/srs](https://github.com/ossrs/srs)
+
+> If you want all of play protocols, this docker image is first recommendation.
+
+
+```
+docker pull ossrs/srs:3
+docker run --rm -p 1935:1935 -p 1985:1985 -p 8080:8080 ossrs/srs:3
+```
+
+**push url:**
+
+`rtmp://localhost/live/live`
+
+**play url:**
+
+`rtmp://localhost/live/live`;
+
+`http://localhost:8080/live/live.flv`;
+
+`http://localhost:8080/live/live.m3u8`.
+
+In addition, **ossrs/srs** may not be very perfect, so I put it to end of the blog.
