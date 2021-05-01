@@ -7,7 +7,7 @@ categories:
 
 In the past, I used to [establish a RTMP stream server](https://www.cameraremote.de/how-to-setup-a-rtmp-streaming-server-on-raspberry-pi-e-g-for-gopro-cameras/) on a Raspbery PI.
 
-Obviously Raspberry PI is small in your workbench，but you still need to find its IP, 
+Obviously Raspberry PI is small in your workbench，but you still need to give it litter space and a electric charge, 
 may the action disturbs your working. 
 
 And now using docker is easy to establish RTMP server.
