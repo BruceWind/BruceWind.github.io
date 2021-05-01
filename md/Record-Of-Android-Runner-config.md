@@ -1,6 +1,6 @@
 title: 配置gitlab-runner服务器的一些问题记录
 date: 2021/04/07 01:24:01
-updated: 2016/12/21 22:52:11
+updated: 2021/05/01 22:52:11
 categories:
 - 技术
 ---
@@ -40,3 +40,8 @@ solution: 既然您在中国大陆做IT, 那就自备梯子. 要么在runner物�
 ### 5.如何做监控性能,掉线提醒等等?
 
 answer: 我是用nodeserver做的,有各种性能监控,磁盘, 掉线发邮件等等功能. 不过中国大陆block了这个网站, 监控服务可能会挂.
+
+### 6.能否在CI中跑Android UI Test？
+
+answer ： 大部分情况下不能，因为你用的是虚拟化服务，因为虚拟化都是用docker镜像，别人已经配置好了，你无需再修改，比较方便。
+如果必须要UI Test只能脱离 docker或者k8s的虚拟化环境，去整一个真机，自己配置环境，然后用apt 从软件中心安装gitlab-runner，把该物理机注册到gitlab服务器上。
