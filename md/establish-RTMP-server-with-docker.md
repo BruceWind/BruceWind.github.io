@@ -24,13 +24,13 @@ docker run -d -p 80:80 -p 1935:1935 --name nginx-hls tiangolo/nginx-rtmp # bind 
 
 **The push stream url:** 
 
-rtmp://{ip}/live/{id}  
+`rtmp://{ip}/live/{id}`
 
 > change {id} if you want，it is stream id.
 
 **The play url:** 
 
-rtmp://{ip}/live/{id}
+`rtmp://{ip}/live/{id}`
 
 It is over in the event that you don't want play a HLS url.
 
@@ -116,10 +116,11 @@ http {
 
 ### The url you can push stream into：
 
-has transcoding：rtmp://localhost/show/live_hd720 , you can replace ***live_{low|mid|hd720}***
+has transcoding：
+`rtmp://localhost/show/live_hd720` , you can replace ***live_{low|mid|hd720}***
 
-no transcoding：rtmp://localhost/show/live
+no transcoding：`rtmp://localhost/show/live`
 
 ### the HLS url you try to play：
 
-http://localhost/hls/live.m3u8
+`http://localhost/hls/live.m3u8`
