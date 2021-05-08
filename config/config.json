@@ -54,6 +54,12 @@
         "data": [
             {
 
+                "title": "播放直播流过程中逐渐延迟问题解决",
+                "mdsource": "md/player-live-offset-adjustment.md",
+                "date": " 2021/05/02 22:38:08"
+            },
+            {
+
                 "title": "用docker在当前电脑起一个RTMP推流服务器",
                 "mdsource": "md/establish-RTMP-server-with-docker.md",
                 "date": " 2021/05/02 22:38:08"
