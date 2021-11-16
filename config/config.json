@@ -16,6 +16,11 @@
                 "title": "2020下半年投资总结",
                 "mdsource": "md/investment-2020-h2.md",
                 "date": "2021-03-26"
+            },
+            {
+                "title": "2021上半年投资总结",
+                "mdsource": "md/investment-2021-h1.md",
+                "date": "2021-11-10"
             }
         ]
     },
@@ -23,8 +28,13 @@
         "category": "开源",
         "data": [
             {
-                "title": "HugestFastestMemoryCache",
-                "mdsource": "https://raw.githubusercontent.com/BruceWind/HugestFastestMemoryCache/master/README.md",
+                "title": "AndroidRemoteBuildWithDocker",
+                "mdsource": "https://github.com/BruceWind/AndroidRemoteBuildWithDocker/blob/main/README.md",
+                "date": "2021-09-10"
+            },
+            {
+                "title": "Juao",
+                "mdsource": "https://raw.githubusercontent.com/BruceWind/Juao/master/README.md",
                 "date": "2020-03-21"
             },
             {
@@ -53,13 +63,11 @@
         "category": "几年后回看会觉得写的太烂",
         "data": [
             {
-
                 "title": "播放直播流过程中逐渐延迟问题解决",
                 "mdsource": "md/player-live-offset-adjustment.md",
                 "date": " 2021/05/02 22:38:08"
             },
             {
-
                 "title": "用docker在当前电脑起一个RTMP推流服务器",
                 "mdsource": "md/establish-RTMP-server-with-docker.md",
                 "date": " 2021/05/02 22:38:08"
