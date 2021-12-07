@@ -26,6 +26,16 @@
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css" />
 
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LGE1LT9YJG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-LGE1LT9YJG');
+  </script>
+
   <style>
     body {
       background-color: #f0f0f0;
@@ -118,15 +128,15 @@
 
     var json_source = 'config/config.json';
     $(document).ready(function () {
-      
+
       $.get(json_source, function (jstring) { renderBlogs(jstring) }, 'text')
         .fail(function () {
           alert("I can't get blogs."); // 
         });
 
-        if(needShowAds()){
-          $('#promotion').show();
-        }
+      if (needShowAds()) {
+        $('#promotion').show();
+      }
     });
 
 
@@ -241,15 +251,7 @@
     <p>邀您来买[质好价优]的产品：</p>
     <ul>
       <li>
-        <a href="https://www.namesilo.com/?rid=3dbf599sf" target="_blank">{不到1美元的域名}.xyz/.top/.club/.icu等</a>
-      </li>
-
-      <li>
-        <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{3.99刀每月}亚洲优化CN②线路∨PS,ping值稳定,丢包低</a>
-      </li>
-
-      <li>
-        <a href="https://my.racknerd.com/aff.php?aff=234" target="_blank">{22刀每年}稳定CN②线路∨PS,超便宜</a>
+        <a href="https://manage.hostdare.com/aff.php?aff=2058" target="_blank">{3.99刀每月}高阶CN②线路∨PS,ping值稳定,丢包低</a>
       </li>
 
       <li>
@@ -257,7 +259,7 @@
       </li>
 
       <li>
-        <a href="https://billing.raksmart.com/whmcs/aff.php?aff=2690" target="_blank">{低至7刀每月}超优质国际线路服务器租赁</a>
+        <a href="https://billing.raksmart.com/whmcs/aff.php?aff=2690" target="_blank">{低至7刀每月}优质线路服务器租赁</a>
       </li>
     </ul>
 
