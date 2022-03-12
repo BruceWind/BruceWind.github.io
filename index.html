@@ -125,11 +125,57 @@
       }
     }
 
+    function renderGits(rawJson) {
 
-    var json_source = 'config/config.json';
+      var jsonData = JSON.parse(rawJson);
+      if (jsonData.length < 1) return;
+
+      createCate('gits');
+      var ul_tag_str = "";
+
+      for (var i = 0; i < jsonData.length; i++) {
+        var item = jsonData[i];
+        var date = item.created_at;
+
+        var ul_tag = document.createElement("ul")
+
+        Object.keys(item.files).forEach(function (k) {
+          var name = k;
+          var childItem = item.files[k];
+          console.log(k + ' - ' + item.files[k]);
+          var mdSource = childItem.raw_url;
+          var type = childItem.type;
+          if (type === 'text/markdown') {
+
+            ul_tag_str = ul_tag_str + '<li>' + date;
+            ul_tag_str = ul_tag_str + '  <a href="javascript:;" onclick="showREADME(';
+            ul_tag_str = ul_tag_str + "'" + mdSource + "'";
+            ul_tag_str = ul_tag_str + ')")>' + name + '</a>  ';
+            ul_tag_str = ul_tag_str + '</li>';
+            ul_tag_str = ul_tag_str + "";
+          }
+        });
+
+        ul_tag.innerHTML = ul_tag_str;
+      }
+
+      document.getElementById("content").appendChild(ul_tag)
+    }
+
+
+    const MY_CONFIG_JSON = 'config/config.json';
+    const GITS_URL = 'https://api.github.com/users/brucewind/gists';
     $(document).ready(function () {
 
-      $.get(json_source, function (jstring) { renderBlogs(jstring) }, 'text')
+
+      if (needShowAds()) {
+        $.get(GITS_URL, function (jstring) { renderGits(jstring) }, 'text')
+          .fail(function () {
+            alert("I can't get gits.");
+          });
+      }
+
+      $.get(MY_CONFIG_JSON, function (jstring) { renderBlogs(jstring) }, 'text')
         .fail(function () {
           alert("I can't get blogs."); // 
         });
@@ -137,6 +183,9 @@
       if (needShowAds()) {
         $('#promotion').show();
       }
+
+
+
     });
 
 
