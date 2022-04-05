@@ -73,7 +73,7 @@ function App() {
           divider={true}
           selected={false}
           key={item.category + index}>
-          <ListItemText primary={<Typography style={{ wordWrap: "break-word" }} type="body2">{subItem.title}</Typography>} secondary={subItem.date} />
+          <ListItemText primary={<Typography style={{ wordWrap: "break-word" }} type="h3">{subItem.title}</Typography>} secondary={subItem.date} />
         </ListItemButton>)
         }
       </List>
@@ -152,7 +152,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-    <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 1 }}>
+    <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 2 }}>
 
       <Paper elevation={3} >
         {renderRow()}
@@ -169,7 +169,6 @@ function App() {
 
       <Dialog
         fullWidth
-        fixed={true}
         maxWidth="xl"
         sx={{ width: '90%', height: '100%' }}
         open={currentBlogSrc ? true : false}
