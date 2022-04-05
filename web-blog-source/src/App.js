@@ -21,6 +21,10 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 // import blogs from '../config/config.json';
 
+
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
@@ -34,7 +38,16 @@ import 'github-markdown-css'
 
 let isRequesting = false;
 function App() {
-
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+        },
+      }),
+    [prefersDarkMode],
+  );
 
   let vertical = 'top';
   let horizontal = 'center';
@@ -137,6 +150,8 @@ function App() {
 
 
   return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
     <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 1 }}>
 
       <Paper elevation={3} >
@@ -181,6 +196,7 @@ function App() {
       </Dialog>
 
     </Box>
+    </ThemeProvider>
   );
 }
 
