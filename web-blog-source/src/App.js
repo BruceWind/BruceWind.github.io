@@ -17,36 +17,24 @@ import Paper from '@mui/material/Paper';
 import { FixedSizeList } from 'react-window';
 import ListSubheader from '@mui/material/ListSubheader';
 import Backdrop from '@mui/material/Backdrop';
+import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 // import blogs from '../config/config.json';
 
+import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import ReactMarkdown from "react-markdown";
+import 'github-markdown-css'
 
 
-function getList(item) {
-  return (
-    <List key={item.category}>
-      <ListSubheader component="div" id="nested-list-subheader">
-        {item.category}
-      </ListSubheader>
-      <Divider />
-      {item.data.map((subItem, index) => <ListItemButton
-        sx={{ marginLeft: 2 }}
-        key={item.category + index}>
-        {subItem.date + ': '}<ListItemText primary={subItem.title} onClick={clickBlog(subItem)} />
-      </ListItemButton>)
-      }
-    </List>
-  );
-}
-
-
-
-function clickBlog(subItem){
-  // setShowingLoading(true);
-}
-
+let isRequesting = false;
 function App() {
+
 
   let vertical = 'top';
   let horizontal = 'center';
@@ -54,40 +42,88 @@ function App() {
   const [blogs, setBlogs] = useState(null);
   const [showingLoading, setShowingLoading] = useState(false);
 
+  const [currentBlogTitle, setCurrentBlogTitle] = useState(null);
+  const [currentBlogSrc, setCurrentBlogSrc] = useState(null);
+  const [currentBlogRaw, setCurrentBlogRaw] = useState(null);
+
+
+  function getList(item) {
+    return (
+      <List key={item.category}>
+        <ListSubheader component="div" id="nested-list-subheader">
+          {item.category}
+        </ListSubheader>
+        <Divider />
+        {item.data.map((subItem, index) => <ListItemButton
+          sx={{ marginLeft: 1 }}
+          onClick={() => clickBlogItem(subItem)}
+          divider={true}
+          selected={false}
+          key={item.category + index}>
+          <ListItemText primary={<Typography style={{ wordWrap: "break-word" }} type="body2">{subItem.title}</Typography>} secondary={subItem.date} />
+        </ListItemButton>)
+        }
+      </List>
+    );
+  }
+
+
+  function clickBlogItem(subItem) {
+    // setShowingLoading(true);
+    let finalUrl = (subItem.mdsource.includes('http://') || subItem.mdsource.includes('https://')) ?
+      subItem.mdsource : 'https://brucewind.github.io/' + subItem.mdsource;
+
+    console.log(finalUrl);
+    setCurrentBlogSrc(finalUrl);
+
+    fetch(finalUrl)
+      .then((res) => res.text())
+      .then(text => {
+        setCurrentBlogRaw(text);
+      })
+      .catch(err => {
+        setTips('请求失败！');
+      });
+  }
+
 
   function renderRow() {
-    if (!blogs) return <Box> <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /></Box>;
-    blogs.map(item => console.log(item.category));
-
-
-
+    if (!blogs) {
+      return <Box>
+        <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
+        <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
+      </Box>;
+    }
 
     return (<List
       sx={{ bgcolor: 'background.paper' }}
       component="nav"
-      aria-labelledby="nested-list-subheader"
-    >
-
+      aria-labelledby="nested-list-subheader">
       {blogs.map(item => getList(item))}
-
     </List>
     );
-
-
   }
 
-
+  function onDialogClose() {
+    setCurrentBlogSrc(null);
+    setCurrentBlogRaw(null);
+    setCurrentBlogTitle(null);
+  }
 
 
 
   useEffect(() => {
 
-    if (!blogs) {
+
+    if (!blogs && !isRequesting) {
+      isRequesting = true;
       fetch('https://brucewind.github.io/config/config.json').then(response => response.json())
         .then(data => {
+          isRequesting = false;
           setBlogs(data);
         })
         .catch(err => {
+          isRequesting = false;
           setTips('请求失败！');
           console.error(err);
         })
@@ -101,21 +137,13 @@ function App() {
 
 
   return (
-    <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 3 }}>
+    <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 1 }}>
 
       <Paper elevation={3} >
-        <Stack spacing={2}>
-          {renderRow()}
-        </Stack>
-
+        {renderRow()}
       </Paper>
-{/* 
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={showingLoading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop> */}
+      {/* 
+      */}
 
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
@@ -123,6 +151,34 @@ function App() {
         message={tips}
         key={vertical + horizontal}
       />
+
+      <Dialog
+        fullWidth
+        fixed={true}
+        maxWidth="xl"
+        sx={{ width: '90%', height: '100%' }}
+        open={currentBlogSrc ? true : false}
+        onClose={() => onDialogClose()}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <DialogTitle id="alert-dialog-title">
+          {currentBlogRaw ? '原文' : '加载中'}
+        </DialogTitle>
+
+        <Divider />
+        <DialogContent>
+          {currentBlogRaw ?
+            <div className='markdown-body'><ReactMarkdown children={currentBlogRaw} /></div> :
+            <CircularProgress color="inherit" />
+          }
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => onDialogClose()}>关闭</Button>
+        </DialogActions>
+      </Dialog>
 
     </Box>
   );
