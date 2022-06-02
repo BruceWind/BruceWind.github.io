@@ -33,6 +33,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
 import 'github-markdown-css'
 
 
@@ -184,7 +186,7 @@ function App() {
         <Divider />
         <DialogContent>
           {currentBlogRaw ?
-            <div className='markdown-body'><ReactMarkdown children={currentBlogRaw} /></div> :
+            <div className='markdown-body'><ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}  children={currentBlogRaw} /></div> :
             <CircularProgress color="inherit" />
           }
         </DialogContent>
