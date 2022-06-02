@@ -4,19 +4,13 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
 import Snackbar from '@mui/material/Snackbar';
 import Skeleton from '@mui/material/Skeleton';
 import Paper from '@mui/material/Paper';
-import { FixedSizeList } from 'react-window';
 import ListSubheader from '@mui/material/ListSubheader';
-import Backdrop from '@mui/material/Backdrop';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 // import blogs from '../config/config.json';
@@ -26,11 +20,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from 'rehype-raw'
@@ -132,16 +124,45 @@ function App() {
 
     if (!blogs && !isRequesting) {
       isRequesting = true;
+
       fetch('https://brucewind.github.io/config/config.json').then(response => response.json())
         .then(data => {
           isRequesting = false;
-          setBlogs(data);
+          // setBlogs(data);
+
+          fetch('https://api.github.com/users/brucewind/gists').then(gitsRsp => gitsRsp.json())
+            .then(gistData => {
+              isRequesting = false;
+
+              const gitsArr = [];
+              gistData.map((itemGits, index) => {
+                if (itemGits.files) {
+                  const title = Object.keys(itemGits.files)[0];
+                  if (itemGits.files[title].type == "text/markdown") {
+                    gitsArr.push({
+                      "title": title,
+                      "mdsource": itemGits.files[title].raw_url,
+                      "date": itemGits.created_at
+                    });
+                  }
+
+                }
+              });
+
+              data.push({
+                category: 'gits',
+                data: gitsArr
+              });
+              setBlogs(data);
+
+            });
+
         })
         .catch(err => {
           isRequesting = false;
           setTips('请求失败！');
           console.error(err);
-        })
+        });
     }
 
     // Specify how to clean up after this effect:
@@ -154,49 +175,49 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-    <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 2 }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper', padding: 2 }}>
 
-      <Paper elevation={3} >
-        {renderRow()}
-      </Paper>
-      {/* 
+        <Paper elevation={3} >
+          {renderRow()}
+        </Paper>
+        {/* 
       */}
 
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={tips ? true : false}
-        message={tips}
-        key={vertical + horizontal}
-      />
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={tips ? true : false}
+          message={tips}
+          key={vertical + horizontal}
+        />
 
-      <Dialog
-        fullWidth
-        maxWidth="xl"
-        sx={{ width: '90%', height: '100%' }}
-        open={currentBlogSrc ? true : false}
-        onClose={() => onDialogClose()}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
-        <DialogTitle id="alert-dialog-title">
-          {currentBlogRaw ? '原文' : '加载中'}
-        </DialogTitle>
+        <Dialog
+          fullWidth
+          maxWidth="xl"
+          sx={{ width: '90%', height: '100%' }}
+          open={currentBlogSrc ? true : false}
+          onClose={() => onDialogClose()}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <DialogTitle id="alert-dialog-title">
+            {currentBlogRaw ? '原文' : '加载中'}
+          </DialogTitle>
 
-        <Divider />
-        <DialogContent>
-          {currentBlogRaw ?
-            <div className='markdown-body'><ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}  children={currentBlogRaw} /></div> :
-            <CircularProgress color="inherit" />
-          }
-        </DialogContent>
+          <Divider />
+          <DialogContent>
+            {currentBlogRaw ?
+              <div className='markdown-body'><ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]} children={currentBlogRaw} /></div> :
+              <CircularProgress color="inherit" />
+            }
+          </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => onDialogClose()}>关闭</Button>
-        </DialogActions>
-      </Dialog>
+          <DialogActions>
+            <Button onClick={() => onDialogClose()}>关闭</Button>
+          </DialogActions>
+        </Dialog>
 
-    </Box>
+      </Box>
     </ThemeProvider>
   );
 }
