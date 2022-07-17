@@ -21,6 +21,16 @@
                 "title": "2021上半年投资总结",
                 "mdsource": "md/investment-2021-h1.md",
                 "date": "2021-11-10"
+            },
+            {
+                "title": "2021下半年投资总结",
+                "mdsource": "md/investment-2021-h2.md",
+                "date": "2022-07-17"
+            },
+            {
+                "title": "2022上半年投资总结",
+                "mdsource": "md/investment-2022-h1.md",
+                "date": "2022-07-17"
             }
         ]
     },
