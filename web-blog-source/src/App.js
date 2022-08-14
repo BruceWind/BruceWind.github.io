@@ -31,6 +31,7 @@ import 'github-markdown-css'
 
 
 let isRequesting = false;
+let isChineseEnv = true;
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const theme = React.useMemo(
@@ -89,7 +90,7 @@ function App() {
         setCurrentBlogRaw(text);
       })
       .catch(err => {
-        setTips('请求失败！');
+        setTips(isChineseEnv ? '请求失败！' : 'Request failed!');
       });
   }
 
@@ -121,11 +122,16 @@ function App() {
 
   useEffect(() => {
 
+    var language = window.navigator.userLanguage || window.navigator.language;
+    console.log(language);
+    isChineseEnv = 'zh-CN' == language;
+    const blogJSONFileName = isChineseEnv ? 'cn_blogs.json' : 'en_blog_list.json';
+
 
     if (!blogs && !isRequesting) {
       isRequesting = true;
 
-      fetch('https://brucewind.github.io/config/config.json').then(response => response.json())
+      fetch(`https://brucewind.github.io/config/${blogJSONFileName}`).then(response => response.json())
         .then(data => {
           isRequesting = false;
           // setBlogs(data);
@@ -160,12 +166,12 @@ function App() {
         })
         .catch(err => {
           isRequesting = false;
-          setTips('请求失败！');
+          setTips(window.isChineseEnv ? '请求失败！' : 'Request failed!');
           console.error(err);
         });
     }
 
-    // Specify how to clean up after this effect:
+    // to clean up after this effect:
     return function cleanup() {
 
     };
@@ -201,7 +207,13 @@ function App() {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <DialogTitle id="alert-dialog-title">
-            {currentBlogRaw ? '原文' : '加载中'}
+
+            {
+              isChineseEnv ?
+                (currentBlogRaw ? '原文' : '加载中')
+                :
+                (currentBlogRaw ? 'Content' : 'loading')
+            }
           </DialogTitle>
 
           <Divider />
@@ -213,7 +225,9 @@ function App() {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => onDialogClose()}>关闭</Button>
+            <Button onClick={() => onDialogClose()}>
+              {isChineseEnv ? '关闭' : 'Close'}
+            </Button>
           </DialogActions>
         </Dialog>
 
