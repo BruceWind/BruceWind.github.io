@@ -39,17 +39,17 @@
         "data": [
             {
                 "title": "AndroidRemoteBuildWithDocker",
-                "mdsource": "https://raw.githubusercontent.com/BruceWind/AndroidRemoteBuildWithDocker/master/README.md",
+                "mdsource": "https://raw.githubusercontent.com/BruceWind/AndroidRemoteBuildWithDocker/master/README_zh.md",
                 "date": "2021-09-10"
             },
             {
                 "title": "Juao",
-                "mdsource": "https://raw.githubusercontent.com/BruceWind/Juao/master/README.md",
+                "mdsource": "https://raw.githubusercontent.com/BruceWind/Juao/master/README_zh.md",
                 "date": "2020-03-21"
             },
             {
                 "title": "Reach high security in Android",
-                "mdsource": "https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README.md",
+                "mdsource": "https://raw.githubusercontent.com/BruceWind/AESJniEncrypt/master/README_zh.md",
                 "date": "2016-11-29"
             },
             {
