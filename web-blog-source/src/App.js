@@ -31,9 +31,9 @@ import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 import 'github-markdown-css'
 
+const KYE_IS_C = 'isChinese';
 
 let isRequesting = false;
-let isChineseEnv = true;
 function App() {
 
 
@@ -97,10 +97,25 @@ function App() {
   const [blogs, setBlogs] = useState(null);
   const [showingLoading, setShowingLoading] = useState(false);
 
+
+  const [isChinese, setIsChinese] = useState(false);
+
   const [currentBlogTitle, setCurrentBlogTitle] = useState(null);
   const [currentBlogSrc, setCurrentBlogSrc] = useState(null);
   const [currentBlogRaw, setCurrentBlogRaw] = useState(null);
 
+
+  const onSwitchLanguage = (event, checked) => {
+    localStorage.setItem(KYE_IS_C, checked);
+
+    setBlogs(null);
+    setIsChinese(checked);
+
+    setTimeout(async () => {
+      toRequestBlogs();
+    }, 300);
+
+  }
 
   function getList(item) {
     return (
@@ -124,7 +139,7 @@ function App() {
 
 
   function clickBlogItem(subItem) {
-    // setShowingLoading(true);
+    setShowingLoading(true);
     let finalUrl = (subItem.mdsource.includes('http://') || subItem.mdsource.includes('https://')) ?
       subItem.mdsource : 'https://brucewind.github.io/' + subItem.mdsource;
 
@@ -135,9 +150,11 @@ function App() {
       .then((res) => res.text())
       .then(text => {
         setCurrentBlogRaw(text);
+        setShowingLoading(false);
       })
       .catch(err => {
-        setTips(isChineseEnv ? '请求失败！' : 'Request failed!');
+        setShowingLoading(false);
+        setTips(isChinese ? '请求失败！' : 'Request failed!');
       });
   }
 
@@ -146,6 +163,10 @@ function App() {
     if (!blogs) {
       return <Box>
         <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
+        <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
+
+        <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
+
         <Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton /><Skeleton />
       </Box>;
     }
@@ -160,7 +181,7 @@ function App() {
         </List>
 
         <div style={{ position: 'absolute', top: 22, right: 15, height: 100, zIndex: 1300 }}>
-          <MaterialUISwitch sx={{ m: 1 }} defaultChecked />
+          <MaterialUISwitch sx={{ m: 1 }} onChange={onSwitchLanguage} checked={isChinese} />
         </div>
       </div>
     );
@@ -173,20 +194,16 @@ function App() {
   }
 
 
+  const toRequestBlogs = () => {
 
-  useEffect(() => {
+    const blogJSONFileName = isChinese ? 'cn_blogs.json' : 'en_blog_list.json';
 
-    var language = window.navigator.userLanguage || window.navigator.language;
-    console.log(language);
-    isChineseEnv = 'zh-CN' == language;
-    const blogJSONFileName = isChineseEnv ? 'cn_blogs.json' : 'en_blog_list.json';
-
-
-    if (!blogs && !isRequesting) {
+    if (!isRequesting) {
       isRequesting = true;
 
-      fetch(`https://brucewind.github.io/config/${blogJSONFileName}`).then(response => response.json())
-        .then(data => {
+      fetch(`https://brucewind.github.io/config/${blogJSONFileName}`)
+        .then(response => response.json())
+        .then(respBlogs => {
           isRequesting = false;
           // setBlogs(data);
 
@@ -209,27 +226,50 @@ function App() {
                 }
               });
 
-              data.push({
+              respBlogs.push({
                 category: 'gits',
                 data: gitsArr
               });
-              setBlogs(data);
+              setBlogs(respBlogs);
 
             });
 
         })
         .catch(err => {
           isRequesting = false;
-          setTips(window.isChineseEnv ? '请求失败！' : 'Request failed!');
+          setTips(isChinese ? '请求失败！' : 'Request failed!');
           console.error(err);
         });
     }
+    else {
+      console.warn(`isRequesting: ${isRequesting}, logs: ${blogs}`);
+    }
+  }
+
+  const prepareLanguages = () => {
+
+    var language = window.navigator.userLanguage || window.navigator.language;
+    let isChineseEnv = 'zh-CN' == language;
+
+    let isC = localStorage.getItem(KYE_IS_C, isChineseEnv) == 'true';
+    setIsChinese(isC)
+
+  }
+
+
+  useEffect(() => {
+
+    prepareLanguages();
+    setTimeout(async () => {
+      toRequestBlogs();
+    }, 300);
+
 
     // to clean up after this effect:
     return function cleanup() {
-
+      console.log('cleanup');
     };
-  });
+  }, []);
 
 
   return (
@@ -264,7 +304,7 @@ function App() {
           <DialogTitle id="alert-dialog-title">
 
             {
-              isChineseEnv ?
+              isChinese ?
                 (currentBlogRaw ? '原文' : '加载中')
                 :
                 (currentBlogRaw ? 'Content' : 'loading')
@@ -281,7 +321,7 @@ function App() {
 
           <DialogActions>
             <Button onClick={() => onDialogClose()}>
-              {isChineseEnv ? '关闭' : 'Close'}
+              {isChinese ? '关闭' : 'Close'}
             </Button>
           </DialogActions>
         </Dialog>
