@@ -34,6 +34,7 @@ import 'github-markdown-css'
 const KYE_IS_C = 'isChinese';
 
 let isRequesting = false;
+let cachedIsChinese = false; //boolean
 function App() {
 
 
@@ -106,10 +107,13 @@ function App() {
 
 
   const onSwitchLanguage = (event, checked) => {
-    localStorage.setItem(KYE_IS_C, checked);
+
+    console.log('onSwitchLanguage', `checked: ${checked}, event: ${event.target.checked}`);
+    localStorage.setItem(KYE_IS_C, '' + checked);
 
     setBlogs(null);
-    setIsChinese(checked);
+    setIsChinese(new Boolean(checked).valueOf());
+    cachedIsChinese = checked ? true : false;
 
     setTimeout(async () => {
       toRequestBlogs();
@@ -194,9 +198,11 @@ function App() {
   }
 
 
-  const toRequestBlogs = () => {
+  function toRequestBlogs() {
 
-    const blogJSONFileName = isChinese ? 'cn_blogs.json' : 'en_blog_list.json';
+    console.log(`toRequestBlogs isChinese: ${cachedIsChinese}`);
+
+    const blogJSONFileName = cachedIsChinese ? 'cn_blogs.json' : 'en_blog_list.json';
 
     if (!isRequesting) {
       isRequesting = true;
@@ -251,8 +257,14 @@ function App() {
     var language = window.navigator.userLanguage || window.navigator.language;
     let isChineseEnv = 'zh-CN' == language;
 
-    let isC = localStorage.getItem(KYE_IS_C, isChineseEnv) == 'true';
-    setIsChinese(isC)
+    console.log('is Chinese Env:' + isChineseEnv)
+
+    //a string value in 'true' or 'false'.
+    let strIsC = localStorage.getItem(KYE_IS_C) || isChineseEnv ? 'true' : 'false';
+
+    console.log('set state  isChinese:' + strIsC)
+    cachedIsChinese = strIsC.toLowerCase() == 'true' ? true : false;
+    setIsChinese(cachedIsChinese);
 
   }
 
@@ -260,9 +272,7 @@ function App() {
   useEffect(() => {
 
     prepareLanguages();
-    setTimeout(async () => {
-      toRequestBlogs();
-    }, 300);
+    toRequestBlogs(isChinese);
 
 
     // to clean up after this effect:
