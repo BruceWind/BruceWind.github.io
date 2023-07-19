@@ -25,7 +25,7 @@ jobs:
       run: cd web-blog-source && npm run build
 
     - name: Copy Production
-      run: cd web-blog-source && rm -rf ../static && cp -r ./build/* ./
+      run: cd web-blog-source && rm -rf ../static && cp -r ./build/* ../
     
     - name: Configure Git
       run: |
