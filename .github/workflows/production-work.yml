@@ -21,10 +21,10 @@ jobs:
         node-version: '16.x'
 
     - name: Install Dependencies
-      run: cd web-blog-source && npm install --force && npm audit fix --force
+      run: cd web-blog-source && yarn install
 
     - name: Build
-      run: cd web-blog-source && npm run build 
+      run: cd web-blog-source && yarn build 
 
     - name: Copy Production
       run: cd web-blog-source && rm -rf ../static && cp -r ./build/* ../
