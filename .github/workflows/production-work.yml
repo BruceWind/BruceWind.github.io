@@ -1,0 +1,39 @@
+name: Node.js Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build
+      run: cd web-blog-source && npm run build
+
+    - name: Copy Production
+      run: rm -rf ./static && cp -r ./build/* ./
+    
+    - name: Configure Git
+      run: |
+        git config --global user.name "commit-bot"
+        git config --global user.email "bot@hide.com"
+
+    - name: Commit Code
+      run: |
+        git add .
+        git commit -m "copy production"
+        git push origin master
