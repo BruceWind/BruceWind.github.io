@@ -3,7 +3,7 @@ name: Node.js Build
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:
@@ -19,13 +19,13 @@ jobs:
         node-version: '16.x'
 
     - name: Install Dependencies
-      run: npm install
+      run: cd web-blog-source && npm install
 
     - name: Build
       run: cd web-blog-source && npm run build
 
     - name: Copy Production
-      run: rm -rf ./static && cp -r ./build/* ./
+      run: cd web-blog-source && rm -rf ../static && cp -r ./build/* ./
     
     - name: Configure Git
       run: |
