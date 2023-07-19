@@ -21,7 +21,7 @@ jobs:
         node-version: '16.x'
 
     - name: Install Dependencies
-      run: cd web-blog-source && npm install
+      run: cd web-blog-source && npm install --force
 
     - name: Build
       run: cd web-blog-source && npm run build
