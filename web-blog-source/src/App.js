@@ -29,6 +29,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
+import remarkMermaidjs from 'remark-mermaidjs'
 import 'github-markdown-css'
 
 const KYE_IS_C = 'isChinese';
@@ -324,7 +325,7 @@ function App() {
           <Divider />
           <DialogContent>
             {currentBlogRaw ?
-              <div className='markdown-body'><ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]} children={currentBlogRaw} /></div> :
+              <div className='markdown-body'><ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm,remarkMermaidjs]} children={currentBlogRaw} /></div> :
               <CircularProgress color="inherit" />
             }
           </DialogContent>
