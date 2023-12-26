@@ -35,6 +35,8 @@ docker run -d -p 80:80 -p 1935:1935 --name nginx-hls tiangolo/nginx-rtmp # bind 
 
 It is over in the event that you don't want play a HLS url.
 
+Before pushing stream to your docker container via these urls,  you can try to use [obs]
+(https://obsproject.com/) to test urls in advance.
 
 ## nginx-hls 
 
