@@ -38,6 +38,11 @@
         "category": "开源",
         "data": [
             {
+                "title": "HysteriaClientDocker",
+                "mdsource": "https://raw.githubusercontent.com/BruceWind/HysteriaClientDocker/refs/heads/main/README_zh.md",
+                "date": "2021-09-10"
+            },
+            {
                 "title": "AndroidRemoteBuildWithDocker",
                 "mdsource": "https://raw.githubusercontent.com/BruceWind/AndroidRemoteBuildWithDocker/master/README_zh.md",
                 "date": "2021-09-10"

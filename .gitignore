@@ -1,3 +1,14 @@
 *.txt
 .lh
 .DS_Store
+
+
+web-blog-source/node_modules
+web-blog-source/build
+web-blog-source/public
+web-blog-source/src
+web-blog-source/package-lock.json
+web-blog-source/package.json
+web-blog-source/README.md
+web-blog-source/yarn.lock
+web-blog-source/yarn.lock
