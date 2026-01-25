@@ -3,18 +3,21 @@
 
 /**
  * Generate a URL-safe slug from a title or filename
+ * Note: We do NOT use encodeURIComponent here because Next.js handles encoding
+ * and GitHub Pages expects the actual characters (not double-encoded)
  */
 export function generateSlug(title, mdsource) {
   // If it's an external URL, use the title
   if (mdsource.startsWith('http://') || mdsource.startsWith('https://')) {
-    // Use title, make it URL-safe
-    return encodeURIComponent(title.replace(/\s+/g, '-').toLowerCase());
+    // Use title, make it URL-safe (replace spaces with dashes)
+    return title.replace(/\s+/g, '-').toLowerCase();
   }
   
   // For local files, use the filename without extension
   const path = require('path');
-  const filename = path.basename(mdsource, '.md');
-  return encodeURIComponent(filename);
+  // Decode any existing URL encoding in the filename first
+  const filename = path.basename(decodeURIComponent(mdsource), '.md');
+  return filename;
 }
 
 /**

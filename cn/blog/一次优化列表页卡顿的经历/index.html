@@ -1,0 +1,260 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="initial-scale=1, width=device-width"/><meta name="emotion-insertion-point" content=""/><title>一次优化列表页卡顿的经历.md<!-- --> - BruceWind&#x27;s Blog</title><meta name="description" content="一次优化列表页卡顿的经历.md - 几年后回看会觉得写的太烂"/><meta property="og:title" content="一次优化列表页卡顿的经历.md"/><meta property="og:type" content="article"/><meta property="article:published_time" content=" 2016/03/24 21:20:01"/><meta name="next-head-count" content="8"/><meta charSet="utf-8"/><meta name="keywords" content="NDK,JNI,Android Dev,android,androidyuan,性能优化,Linux,developer"/><meta name="description" content="BruceWind&#x27;s personal blog - Android development, Linux, and more."/><meta name="robots" content="index,follow"/><meta name="google" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="author" content="bruce"/><link rel="icon" href="/favicon.ico"/><meta name="theme-color" content="#000000"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-LGE1LT9YJG"></script><script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-LGE1LT9YJG');
+              </script><style data-emotion="mui-style-global o6gwfi">html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:rgba(0, 0, 0, 0.87);font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.5;letter-spacing:0.00938em;background-color:#fff;}@media print{body{background-color:#fff;}}body::backdrop{background-color:#fff;}</style><style data-emotion="mui-style 17ro72p 1cp6o32 79elbk 1qo0fs4 1uf4bbi 1m9pwf3 19gndve 1ju1kxc k1u9gz 6xugel vubbuv gtvj52 1x1vlev vax71z">.mui-style-17ro72p{width:100%;min-height:100vh;background-color:#fff;padding:16px;}.mui-style-1cp6o32{background-color:#fff;color:rgba(0, 0, 0, 0.87);-webkit-transition:box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;border-radius:4px;box-shadow:0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12);padding:24px;}.mui-style-79elbk{position:relative;}.mui-style-1qo0fs4{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;width:58px;height:38px;overflow:hidden;padding:12px;box-sizing:border-box;position:relative;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;z-index:0;vertical-align:middle;width:62px;height:34px;padding:7px;margin:8px;}@media print{.mui-style-1qo0fs4{-webkit-print-color-adjust:exact;color-adjust:exact;}}.mui-style-1qo0fs4 .MuiSwitch-switchBase{margin:1px;padding:0;-webkit-transform:translateX(6px);-moz-transform:translateX(6px);-ms-transform:translateX(6px);transform:translateX(6px);}.mui-style-1qo0fs4 .MuiSwitch-switchBase.Mui-checked{color:#fff;-webkit-transform:translateX(22px);-moz-transform:translateX(22px);-ms-transform:translateX(22px);transform:translateX(22px);}.mui-style-1qo0fs4 .MuiSwitch-switchBase.Mui-checked .MuiSwitch-thumb:before{background-image:url('data:image/svg+xml;utf8,<?xml version="1.0" ?><svg height="20" width="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M0 0h24v24H0z" fill="none"/><path fill="white" d="M12 19a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-5.5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm11 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM13 2v2h6v2h-1.968a18.222 18.222 0 0 1-3.621 6.302 14.685 14.685 0 0 0 5.327 3.042l-.536 1.93A16.685 16.685 0 0 1 12 13.726a16.696 16.696 0 0 1-6.202 3.547l-.536-1.929a14.7 14.7 0 0 0 5.327-3.042 18.077 18.077 0 0 1-2.822-4.3h2.24A16.031 16.031 0 0 0 12 10.876a16.168 16.168 0 0 0 2.91-4.876L5 6V4h6V2h2z"/></g></svg>');}.mui-style-1qo0fs4 .MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track{opacity:1;background-color:#aab4be;}.mui-style-1qo0fs4 .MuiSwitch-thumb{background-color:#001e3c;width:32px;height:32px;}.mui-style-1qo0fs4 .MuiSwitch-thumb:before{content:'';position:absolute;width:100%;height:100%;left:0;top:0;background-repeat:no-repeat;-webkit-background-position:center;background-position:center;background-image:url('data:image/svg+xml;utf8,<?xml version="1.0" ?><svg height="20" width="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" /><path fill="white" d="M14 10h2v.757a4.5 4.5 0 0 1 7 3.743V20h-2v-5.5c0-1.43-1.175-2.5-2.5-2.5S16 13.07 16 14.5V20h-2V10zm-2-6v2H4v5h8v2H4v5h8v2H2V4h10z"/></svg>');}.mui-style-1qo0fs4 .MuiSwitch-track{opacity:1;background-color:#aab4be;border-radius:10px;}.mui-style-1uf4bbi{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;box-sizing:border-box;-webkit-tap-highlight-color:transparent;background-color:transparent;outline:0;border:0;margin:0;border-radius:0;padding:0;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-moz-appearance:none;-webkit-appearance:none;-webkit-text-decoration:none;text-decoration:none;color:inherit;padding:9px;border-radius:50%;position:absolute;top:0;left:0;z-index:1;color:#fff;-webkit-transition:left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,-webkit-transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.mui-style-1uf4bbi::-moz-focus-inner{border-style:none;}.mui-style-1uf4bbi.Mui-disabled{pointer-events:none;cursor:default;}@media print{.mui-style-1uf4bbi{-webkit-print-color-adjust:exact;color-adjust:exact;}}.mui-style-1uf4bbi.Mui-checked{-webkit-transform:translateX(20px);-moz-transform:translateX(20px);-ms-transform:translateX(20px);transform:translateX(20px);}.mui-style-1uf4bbi.Mui-disabled{color:#f5f5f5;}.mui-style-1uf4bbi.Mui-checked+.MuiSwitch-track{opacity:0.5;}.mui-style-1uf4bbi.Mui-disabled+.MuiSwitch-track{opacity:0.12;}.mui-style-1uf4bbi .MuiSwitch-input{left:-100%;width:300%;}.mui-style-1uf4bbi:hover{background-color:rgba(0, 0, 0, 0.04);}@media (hover: none){.mui-style-1uf4bbi:hover{background-color:transparent;}}.mui-style-1uf4bbi.Mui-checked{color:#1976d2;}.mui-style-1uf4bbi.Mui-checked:hover{background-color:rgba(25, 118, 210, 0.04);}@media (hover: none){.mui-style-1uf4bbi.Mui-checked:hover{background-color:transparent;}}.mui-style-1uf4bbi.Mui-checked.Mui-disabled{color:rgb(167, 202, 237);}.mui-style-1uf4bbi.Mui-checked+.MuiSwitch-track{background-color:#1976d2;}.mui-style-1m9pwf3{cursor:inherit;position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;margin:0;padding:0;z-index:1;}.mui-style-19gndve{box-shadow:0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);background-color:currentColor;width:20px;height:20px;border-radius:50%;}.mui-style-1ju1kxc{height:100%;width:100%;border-radius:7px;z-index:-1;-webkit-transition:opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;background-color:#000;opacity:0.38;}.mui-style-k1u9gz{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;box-sizing:border-box;-webkit-tap-highlight-color:transparent;background-color:transparent;outline:0;border:0;margin:0;border-radius:0;padding:0;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-moz-appearance:none;-webkit-appearance:none;-webkit-text-decoration:none;text-decoration:none;color:inherit;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:500;font-size:0.875rem;line-height:1.75;letter-spacing:0.02857em;text-transform:uppercase;min-width:64px;padding:6px 8px;border-radius:4px;-webkit-transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;color:#1976d2;margin-bottom:16px;}.mui-style-k1u9gz::-moz-focus-inner{border-style:none;}.mui-style-k1u9gz.Mui-disabled{pointer-events:none;cursor:default;}@media print{.mui-style-k1u9gz{-webkit-print-color-adjust:exact;color-adjust:exact;}}.mui-style-k1u9gz:hover{-webkit-text-decoration:none;text-decoration:none;background-color:rgba(25, 118, 210, 0.04);}@media (hover: none){.mui-style-k1u9gz:hover{background-color:transparent;}}.mui-style-k1u9gz.Mui-disabled{color:rgba(0, 0, 0, 0.26);}.mui-style-6xugel{display:inherit;margin-right:8px;margin-left:-4px;}.mui-style-6xugel>*:nth-of-type(1){font-size:20px;}.mui-style-vubbuv{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:1em;height:1em;display:inline-block;fill:currentColor;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;-webkit-transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;font-size:1.5rem;}.mui-style-gtvj52{margin:0;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:2.125rem;line-height:1.235;letter-spacing:0.00735em;margin-bottom:0.35em;}.mui-style-1x1vlev{margin:0;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:0.875rem;line-height:1.43;letter-spacing:0.01071em;margin-bottom:0.35em;color:rgba(0, 0, 0, 0.6);}.mui-style-vax71z{margin:0;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;border-width:0;border-style:solid;border-color:rgba(0, 0, 0, 0.12);border-bottom-width:thin;margin-top:16px;margin-bottom:16px;}</style><link rel="preload" href="/_next/static/css/345ff263c1768dbb.css" as="style"/><link rel="stylesheet" href="/_next/static/css/345ff263c1768dbb.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-6ef43a8d4a395f49.js" defer=""></script><script src="/_next/static/chunks/framework-64ad27b21261a9ce.js" defer=""></script><script src="/_next/static/chunks/main-5b2299ded1a46c83.js" defer=""></script><script src="/_next/static/chunks/pages/_app-4f0aaa3a6ba99024.js" defer=""></script><script src="/_next/static/chunks/34-75ae01f5fa578a9a.js" defer=""></script><script src="/_next/static/chunks/995-a5f98cc3a4d14286.js" defer=""></script><script src="/_next/static/chunks/771-702e6dcd51d5534b.js" defer=""></script><script src="/_next/static/chunks/pages/%5Blang%5D/blog/%5Bslug%5D-f7777f3ea9ebdd54.js" defer=""></script><script src="/_next/static/gemsgeIqO9drZBXzEf0vV/_buildManifest.js" defer=""></script><script src="/_next/static/gemsgeIqO9drZBXzEf0vV/_ssgManifest.js" defer=""></script></head><body><div id="__next"><div class="MuiBox-root mui-style-17ro72p"><div class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation3 mui-style-1cp6o32"><div class="MuiBox-root mui-style-79elbk"><div style="position:absolute;top:22px;right:15px;height:100px;z-index:1300"><span class="MuiSwitch-root MuiSwitch-sizeMedium mui-style-1qo0fs4"><span class="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary Mui-checked PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary Mui-checked Mui-checked mui-style-1uf4bbi"><input class="PrivateSwitchBase-input MuiSwitch-input mui-style-1m9pwf3" type="checkbox" checked=""/><span class="MuiSwitch-thumb mui-style-19gndve"></span></span><span class="MuiSwitch-track mui-style-1ju1kxc"></span></span></div><a class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary mui-style-k1u9gz" tabindex="0" href="/cn/"><span class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium mui-style-6xugel"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-style-vubbuv" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ArrowBackIcon"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"></path></svg></span>返回列表</a><h1 class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom mui-style-gtvj52">一次优化列表页卡顿的经历.md</h1><p class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom mui-style-1x1vlev">几年后回看会觉得写的太烂<!-- --> | <!-- --> 2016/03/24 21:20:01</p><hr class="MuiDivider-root MuiDivider-fullWidth mui-style-vax71z"/><div class="markdown-body"><p>title: 一次优化列表页卡顿的经历
+date: 2016/03/24 21:20:01
+updated: 2016/07/14 22:58:22
+categories:</p>
+<ul>
+<li>技术</li>
+</ul>
+<hr/>
+<pre><code>写下这篇文章的日期是2016年4月初。当时来到公司，项目之前是外包出去的，代码乱糟糟的，需要重构掉，摆在面前的问题不是重构项目，而是一些列表页的紧急的性能优化。
+</code></pre>
+<h2>1.先优化item的层级</h2>
+<pre><code>其实层级只要不是太深的话，比如5层，6层，对性能的差别在中等性能的机器上几乎看不出来的，但是想要做到 极致,我就得死扣细节，原来代码是有4层的，其实有一点点接近可优化的范围了，我把原来的4层降到1层。1层的话在item的话，在cpu进行计算测量的时候就速度很快了。
+</code></pre>
+<h3>下面是我用DDMS去查看<em><strong>某厂</strong></em>和<em><strong>我厂</strong></em>的列表的控件层级对比。</h3>
+<h1></h1>
+<p>如图：某厂的列表的item的层级，<strong>三层</strong>：<code>  Grid&gt;Linear&gt;Frame&gt;Rela</code>
+<img src="assets/listper1.png" alt="某厂的列表的item的层级"/></p>
+<h1></h1>
+<p>我厂 的列表页的<code>优化后</code>的item的层级，<strong>一层</strong>：<code>Grid&gt;Rela</code></p>
+<h1></h1>
+<p><img src="assets/listper2.png" alt="我厂的列表的item的层"/>
+其实敌台列表页卡顿也是严重，而且肉眼可见的控件，敌台比我台少了一个圆形头像的控件，bitmap占大头，虽然敌台有几个textview，但是textview本身就几乎没什么可以性能优化的东西了。但是我依旧要做的比敌台还要流畅。</p>
+<h1></h1>
+<hr/>
+<h2>2.优化<strong>OVERDRAW</strong>过渡绘制的问题。</h2>
+<p>旧的代码，先来看下listview的getview方法的代码：</p>
+<pre><code>    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_live_adapter, parent, false);
+        }
+        LinearLayout layout_item_live = BaseViewHolder.get(convertView, R.id.layout_item_live);
+        if (position % 2 == 0) {//重点在于这里
+            layout_item_live.setPadding(20, 20, 10, 0);
+        } else if (position % 2 == 1) {
+            layout_item_live.setPadding(10, 20, 20, 0);
+        }
+        ImageView iv_item_live_cover = BaseViewHolder.get(convertView, R.id.iv_item_live_cover);
+        TextView tv_live_hostname = BaseViewHolder.get(convertView, R.id.tv_live_hostname);
+        TextView tv_item_live_viewernum = BaseViewHolder.get(convertView, R.id.tv_item_live_viewernum);
+        TextView tv_item_live_title = BaseViewHolder.get(convertView, R.id.tv_item_live_title);
+        CircleImageView iv_item_recycle_host_head = BaseViewHolder.get(convertView, R.id.iv_item_recycle_host_head);
+        bitmapUtils.configDefaultLoadFailedImage(R.mipmap.live_default);
+        bitmapUtils.configDefaultLoadingImage(R.mipmap.live_default);
+        bitmapUtils.display(iv_item_live_cover, list_info.get(position).get(&quot;thumb&quot;).toString());
+        bitmapUtils.display(iv_item_recycle_host_head , list_info.get(position).get(&quot;avatar&quot;).toString());
+        tv_live_hostname.setText(list_info.get(position).get(&quot;nick&quot;).toString());
+        int view = Integer.parseInt(list_info.get(position).get(&quot;view&quot;).toString());
+        if(view &gt; 10000){
+            BigDecimal b1 = new BigDecimal(view);
+            BigDecimal b2 = new BigDecimal(10000);
+            tv_item_live_viewernum.setText(b1.divide(b2,1,BigDecimal.ROUND_HALF_UP).doubleValue()+&quot;W&quot;);
+        }else{
+            tv_item_live_viewernum.setText(view + &quot;&quot;);
+        }
+        tv_item_live_title.setText(list_info.get(position).get(&quot;title&quot;).toString());
+        return convertView;
+    }
+</code></pre>
+<p><code>setPadding</code>理论上来说会出发<code>childMeasure</code>方法，然后就是一堆的UI线程的不断去计算的东西。然后子层级和自控件也不是特别少，所以这里问题也是很大啊！！</p>
+<h1>用traceview追踪卡顿的过程CPU耗时在哪里比较多</h1>
+<p>旧的代码运行时，滚动列表，为了公平，在listview上下滚动过之后，保证有了图片的内存缓存之后，清理下log，再滚动抓取的截图如下
+<img src="assets/traceview1.png" alt=""/>
+ui线程只有空闲的时候才会去循环loop。如果我的list滚动的性能不好loop的占用的百分比肯定低。目前，Looper的占比只有50%左右。
+<img src="assets/traceview2.png" alt=""/>
+往下翻，请仔细看30那行，虽然我选中的时25行！！！
+<img src="assets/traaceview3.png" alt=""/>
+30这行指向了我们自己的com.maimiao...的一个自定义控件，占了35%的cpu耗时，所以这里有点严重了。如果去除这35%，基本上也是接近于90%的loope。</p>
+<h1></h1>
+<h2>贴出traceview指向的这个自定义控件的一些方法</h2>
+<p><code>RoundImageViewByXfermode</code>这个类是旧的代码里用于做圆角而使用的自定义控件。其实实现圆角有三种方案，我按性能高低排序往下说，</p>
+<blockquote>
+<ul>
+<li>第一种，画矩形图，不修圆角，使用和背景色一致OVERCOLOR盖住四个角</li>
+<li>第二种，bitmapShader。</li>
+<li>第三种，Xfermode。旧的代码正是用的这种。</li>
+</ul>
+</blockquote>
+<pre><code>
+	@SuppressLint(&quot;DrawAllocation&quot;)
+	@Override
+	protected void onDraw(Canvas canvas)
+	{
+		//在缓存中取出bitmap
+		Bitmap bitmap = mWeakBitmap == null ? null : mWeakBitmap.get();
+
+		if (null == bitmap || bitmap.isRecycled())
+		{
+			//拿到Drawable
+			Drawable drawable = getDrawable();
+			
+
+			if (drawable != null)
+			{
+				//获取drawable的宽和高
+				int dWidth = drawable.getIntrinsicWidth();
+				int dHeight = drawable.getIntrinsicHeight();
+				//创建bitmap
+				bitmap = Bitmap.createBitmap(getWidth(), getHeight(),
+						Config.ARGB_8888);
+				float scale = 1.0f;
+				//创建画布
+				Canvas drawCanvas = new Canvas(bitmap);
+				//按照bitmap的宽高，以及view的宽高，计算缩放比例；因为设置的src宽高比例可能和imageview的宽高比例不同，这里我们不希望图片失真；
+				if (type == TYPE_ROUND)
+				{
+					// 如果图片的宽或者高与view的宽高不匹配，计算出需要缩放的比例；缩放后的图片的宽高，一定要大于我们view的宽高；所以我们这里取大值；
+					scale = Math.max(getWidth() * 1.0f / dWidth, getHeight()
+							* 1.0f / dHeight);
+				} else
+				{
+					scale = getWidth() * 1.0F / Math.min(dWidth, dHeight);
+				}
+				//根据缩放比例，设置bounds，相当于缩放图片了
+				drawable.setBounds(0, 0, (int) (scale * dWidth),
+						(int) (scale * dHeight));
+				drawable.draw(drawCanvas);
+				if (mMaskBitmap == null || mMaskBitmap.isRecycled())
+				{
+					mMaskBitmap = getBitmap();
+				}
+				// Draw Bitmap.
+				mPaint.reset();
+				mPaint.setFilterBitmap(false);
+				mPaint.setXfermode(mXfermode);
+				//绘制形状
+				drawCanvas.drawBitmap(mMaskBitmap, 0, 0, mPaint);
+				mPaint.setXfermode(null);
+				//将准备好的bitmap绘制出来
+				canvas.drawBitmap(bitmap, 0, 0, null);
+				//bitmap缓存起来，避免每次调用onDraw，分配内存
+				mWeakBitmap = new WeakReference&lt;Bitmap&gt;(bitmap);
+			}
+		}
+		//如果bitmap还存在，则直接绘制即可
+		if (bitmap != null)
+		{
+			mPaint.setXfermode(null);
+			canvas.drawBitmap(bitmap, 0.0f, 0.0f, mPaint);
+			return;
+		}
+
+	}
+	/**
+	 * 绘制形状
+	 * @return
+	 */
+	public Bitmap getBitmap()
+	{
+		Bitmap bitmap = Bitmap.createBitmaps(getWidth(), getHeight(),
+				Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint.setColor(Color.BLACK);
+
+		if (type == TYPE_ROUND)
+		{
+			canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),
+					mBorderRadius, mBorderRadius, paint);
+		} else
+		{
+			canvas.drawCircle(getWidth() / 2, getWidth() / 2, getWidth() / 2,
+					paint);
+		}
+
+		return bitmap;
+	}
+</code></pre>
+<pre><code>如上，代码明显性能很差，createBitmap，Bitmap的色彩用的也是ARGB_8888，内存消耗也很大，同时还频繁使用setXfermode模式，这些东西都在UI线程走，性能极差。
+</code></pre>
+<p>为了证明traceview没骗我，我也没冤枉他，我把自定义控件改成了imageview，padding也去掉，性能确实提升了很高。</p>
+<h1></h1>
+<p>为了解决这些问题我打算用fresco去完成这些工作，fresco的老东家把android性能优化做到了极致，研究了好多年，也贡献了很多文献资料开源的东西。</p>
+<h2>fresco，对于圆角和圆形有两种方案</h2>
+<blockquote>
+<ul>
+<li>第一种，OVERLAY_COLOR,就是正常展示一张正方形图，圆角的地方用非透明颜色绘制遮挡的方案，来完成，这种性能极高。但是，如果碰到控件背景非透明的情况，就没法用了。</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>第二种，BITMAP_ONLY,原型图他是用BitmapShader来完成性能不怎样，但是fresco只能尽量帮你做到不重复创建bitmap之类的性能问题，来实现圆形或者圆角。</li>
+</ul>
+</blockquote>
+<pre><code>fresco绝对不用xfermode方案。
+</code></pre>
+<h1></h1>
+<h2>使用SystemClock去抓取getView或者bindHolder方法之行的耗时</h2>
+<p>贴出优化之前的getview中代码段的耗时，为了公平，不把LayoutInflat这行代码纪录进来。因为后面我打重构这个list之后，我用的是RecyclerView，bind方法和create方法是分开的，我要保证公平。
+<img src="assets/log0.png" alt=""/>
+明显这个旧的getView的代码已经明显出现耗时的抖动问题了，重构之后的那段<code>BindHolder</code>代码的cpu耗时标准的在2-4ms之间,后面会贴出截图。旧的代码他猛起来居然可以跑到7，其实有些地方截图没截到，还有10ms的，一个getView都10ms，那一些log看不到的地方再算下来会更加严重的，这就是为什么这个list这么卡的原因。</p>
+<h1></h1>
+<pre><code>android屏幕刷新频率是16ms，如果一旦UI线程繁忙超过16ms，那么就很容易被看出卡顿，当然页面静止的情况下页面卡顿的话也是很难看出来，因为卡是静止的，不卡也是静止的。但是到列表页上之后，就不同了，到了列表页，很多问题都容易被凸显出来，滚动不流畅，明显掉帧，这些都要去仔细找问题。
+</code></pre>
+<h1></h1>
+<p>为了找到这段getView中cpu耗时抖动的问题，我先猜测一些第三方的东西，那就是xutils了，其次时BaseViewHolder这个查找view的代码，他内部是SparseArray，理论上来说性能也是蛮高的，所以先从xutils下手，我不能没有证据的责怪xutils，所以我再次打log在xutils那三四行代码上，不抓取其他的代码耗时。</p>
+<h1></h1>
+<p>为了保证公平，我多上下滚动几遍，等xutils把图片都缓存到内存中之后，我清掉日志，开始滚动，看到的数据是这样子。
+<img src="assets/log1.png" alt=""/>
+确实很明显，这里把计时夹在xutils的几行代码得前后，居然有两次他cpu耗时到了4，安静下来的时候也可以是0,所以，无疑这个地方xutils难逃干系。</p>
+<h1></h1>
+<p>下面是重构方案</p>
+<h1>重构之后</h1>
+<p>重构之后这里圆角和圆形都使用fresco来完成这些，圆角的大图由于背景色是白色就可以用OVERLAY_COLOR，那个圆形头像背景需要透明，所以还是得BITMAP_ONLY模式。</p>
+<pre><code>    //贴出重构之后的bindHolder代码
+    @Override
+    public void onBindItemViewHolder(LiveFragholder holder, final int position) {
+
+
+        String url=getList().get(position).get(&quot;avatar&quot;).toString()+&quot;&quot;;
+
+        FrescoUtils.displayAvatar(holder.iv_item_recycle_host_head,url);
+        FrescoUtils.displayUrl(holder.iv_item_live_cover, getList().get(position).get(&quot;thumb&quot;).toString());
+
+
+        holder.tv_live_hostname.setText(getList().get(position).get(&quot;nick&quot;).toString());
+        int view = Integer.parseInt(getList().get(position).get(&quot;view&quot;).toString());
+        if(view &gt; 10000){
+            BigDecimal b1 = new BigDecimal(view);
+            BigDecimal b2 = new BigDecimal(10000);
+            holder.tv_item_live_viewernum.setText(b1.divide(b2,1,BigDecimal.ROUND_HALF_UP).doubleValue()+&quot;W&quot;);
+        }else{
+            holder.tv_item_live_viewernum.setText(view + &quot;&quot;);
+        }
+        holder.tv_item_live_title.setText(getList().get(position).get(&quot;title&quot;).toString());
+
+        final Context context=holder.iv_item_live_cover.getContext();
+        holder.iv_item_live_cover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HashMap&lt;String,String&gt; mob_map = new HashMap&lt;&gt;();
+                //因为某些圆形这里还在使用hasmap
+                mob_map.put(&quot;position&quot;,position + &quot;&quot;);
+                MobclickAgent.onEvent(context, UmengCollectConfig.ZB_FL,mob_map);
+                Bundle bundle = new Bundle();
+                bundle.putString(&quot;uid&quot;, getList().get(position).get(&quot;uid&quot;).toString());
+                Intent intent = new Intent();
+                intent.setClass(context, TheLiveActivity.class);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+            }
+        });
+    }
+
+</code></pre>
+<p>来看下优化之后的onBinderItem的全部代码，滚动过程的时traceview抓取的数据。
+<img src="assets/traceview4.png" alt=""/>
+明显看到一个点，90.2%的耗时都在Looper.loop上。这说明是正常的，上面说了ui线程只有空闲的时候才会去循环的loop。如果我的list滚动的性能不好loop的占用的百分比肯定低。</p>
+<h1></h1>
+<p>在我的<code>BindHoder</code>代码开头做一个毫秒级时间戳的记录，在结尾处也做个纪录，对比两个时间戳的差值，查看具体我在<code>BindHoder</code>中的代码耗时。
+<img src="assets/log2.png" alt=""/>
+cpu耗时标准的在2-4ms之间。非常的稳定，没有乱飘的现象。</p>
+<p>这个时间比之前得一个时间长了点，没问题的，这个是抓取全部得onBindItem得代码，上面只是截取 xutils载入图片的几行代码而已。所以这里全部的代码已经顶了原来旧的代码里面xutils的几行了。cpu耗时提升了很多很多。前面的还要前面那张耗时的log才是正确的getView里全部得代码耗时统计。</p>
+<hr/>
+<h1>简直完美！！！！对比下敌台的列表页，肉眼明显可见的敌台列表页卡顿比我们还严重，而且对方的item还比我们多了一个圆形头像的空间。终于可以拍着膀子说我们比敌台性能好。</h1></div></div></div></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"post":{"slug":"一次优化列表页卡顿的经历","title":"一次优化列表页卡顿的经历.md","mdsource":"md/一次优化列表页卡顿的经历.md","date":" 2016/03/24 21:20:01","category":"几年后回看会觉得写的太烂"},"content":"title: 一次优化列表页卡顿的经历\ndate: 2016/03/24 21:20:01\nupdated: 2016/07/14 22:58:22\ncategories:\n- 技术\n---\n    写下这篇文章的日期是2016年4月初。当时来到公司，项目之前是外包出去的，代码乱糟糟的，需要重构掉，摆在面前的问题不是重构项目，而是一些列表页的紧急的性能优化。\n\n## 1.先优化item的层级\n\n    其实层级只要不是太深的话，比如5层，6层，对性能的差别在中等性能的机器上几乎看不出来的，但是想要做到 极致,我就得死扣细节，原来代码是有4层的，其实有一点点接近可优化的范围了，我把原来的4层降到1层。1层的话在item的话，在cpu进行计算测量的时候就速度很快了。\n\n### 下面是我用DDMS去查看***某厂***和***我厂***的列表的控件层级对比。\n# \n如图：某厂的列表的item的层级，**三层**：`  Grid\u003eLinear\u003eFrame\u003eRela`\n![某厂的列表的item的层级](assets/listper1.png)\n# \n我厂 的列表页的`优化后`的item的层级，**一层**：` Grid\u003eRela `\n# \n![我厂的列表的item的层](assets/listper2.png)\n其实敌台列表页卡顿也是严重，而且肉眼可见的控件，敌台比我台少了一个圆形头像的控件，bitmap占大头，虽然敌台有几个textview，但是textview本身就几乎没什么可以性能优化的东西了。但是我依旧要做的比敌台还要流畅。\n#  \n-------------------\n\n## 2.优化**OVERDRAW**过渡绘制的问题。\n旧的代码，先来看下listview的getview方法的代码：\n```\n    @Override\n    public View getView(int position, View convertView, ViewGroup parent) {\n        if (convertView == null) {\n            convertView = LayoutInflater.from(context).inflate(R.layout.item_live_adapter, parent, false);\n        }\n        LinearLayout layout_item_live = BaseViewHolder.get(convertView, R.id.layout_item_live);\n        if (position % 2 == 0) {//重点在于这里\n            layout_item_live.setPadding(20, 20, 10, 0);\n        } else if (position % 2 == 1) {\n            layout_item_live.setPadding(10, 20, 20, 0);\n        }\n        ImageView iv_item_live_cover = BaseViewHolder.get(convertView, R.id.iv_item_live_cover);\n        TextView tv_live_hostname = BaseViewHolder.get(convertView, R.id.tv_live_hostname);\n        TextView tv_item_live_viewernum = BaseViewHolder.get(convertView, R.id.tv_item_live_viewernum);\n        TextView tv_item_live_title = BaseViewHolder.get(convertView, R.id.tv_item_live_title);\n        CircleImageView iv_item_recycle_host_head = BaseViewHolder.get(convertView, R.id.iv_item_recycle_host_head);\n        bitmapUtils.configDefaultLoadFailedImage(R.mipmap.live_default);\n        bitmapUtils.configDefaultLoadingImage(R.mipmap.live_default);\n        bitmapUtils.display(iv_item_live_cover, list_info.get(position).get(\"thumb\").toString());\n        bitmapUtils.display(iv_item_recycle_host_head , list_info.get(position).get(\"avatar\").toString());\n        tv_live_hostname.setText(list_info.get(position).get(\"nick\").toString());\n        int view = Integer.parseInt(list_info.get(position).get(\"view\").toString());\n        if(view \u003e 10000){\n            BigDecimal b1 = new BigDecimal(view);\n            BigDecimal b2 = new BigDecimal(10000);\n            tv_item_live_viewernum.setText(b1.divide(b2,1,BigDecimal.ROUND_HALF_UP).doubleValue()+\"W\");\n        }else{\n            tv_item_live_viewernum.setText(view + \"\");\n        }\n        tv_item_live_title.setText(list_info.get(position).get(\"title\").toString());\n        return convertView;\n    }\n```\n\n`setPadding`理论上来说会出发`childMeasure`方法，然后就是一堆的UI线程的不断去计算的东西。然后子层级和自控件也不是特别少，所以这里问题也是很大啊！！\n\n\n# 用traceview追踪卡顿的过程CPU耗时在哪里比较多\n\n旧的代码运行时，滚动列表，为了公平，在listview上下滚动过之后，保证有了图片的内存缓存之后，清理下log，再滚动抓取的截图如下\n![](assets/traceview1.png)\nui线程只有空闲的时候才会去循环loop。如果我的list滚动的性能不好loop的占用的百分比肯定低。目前，Looper的占比只有50%左右。\n![](assets/traceview2.png)\n往下翻，请仔细看30那行，虽然我选中的时25行！！！\n![](assets/traaceview3.png)\n30这行指向了我们自己的com.maimiao...的一个自定义控件，占了35%的cpu耗时，所以这里有点严重了。如果去除这35%，基本上也是接近于90%的loope。\n# \n## 贴出traceview指向的这个自定义控件的一些方法\n\n`RoundImageViewByXfermode`这个类是旧的代码里用于做圆角而使用的自定义控件。其实实现圆角有三种方案，我按性能高低排序往下说，\n\u003e- 第一种，画矩形图，不修圆角，使用和背景色一致OVERCOLOR盖住四个角\n\u003e- 第二种，bitmapShader。\n\u003e- 第三种，Xfermode。旧的代码正是用的这种。\n```\n\n\t@SuppressLint(\"DrawAllocation\")\n\t@Override\n\tprotected void onDraw(Canvas canvas)\n\t{\n\t\t//在缓存中取出bitmap\n\t\tBitmap bitmap = mWeakBitmap == null ? null : mWeakBitmap.get();\n\n\t\tif (null == bitmap || bitmap.isRecycled())\n\t\t{\n\t\t\t//拿到Drawable\n\t\t\tDrawable drawable = getDrawable();\n\t\t\t\n\n\t\t\tif (drawable != null)\n\t\t\t{\n\t\t\t\t//获取drawable的宽和高\n\t\t\t\tint dWidth = drawable.getIntrinsicWidth();\n\t\t\t\tint dHeight = drawable.getIntrinsicHeight();\n\t\t\t\t//创建bitmap\n\t\t\t\tbitmap = Bitmap.createBitmap(getWidth(), getHeight(),\n\t\t\t\t\t\tConfig.ARGB_8888);\n\t\t\t\tfloat scale = 1.0f;\n\t\t\t\t//创建画布\n\t\t\t\tCanvas drawCanvas = new Canvas(bitmap);\n\t\t\t\t//按照bitmap的宽高，以及view的宽高，计算缩放比例；因为设置的src宽高比例可能和imageview的宽高比例不同，这里我们不希望图片失真；\n\t\t\t\tif (type == TYPE_ROUND)\n\t\t\t\t{\n\t\t\t\t\t// 如果图片的宽或者高与view的宽高不匹配，计算出需要缩放的比例；缩放后的图片的宽高，一定要大于我们view的宽高；所以我们这里取大值；\n\t\t\t\t\tscale = Math.max(getWidth() * 1.0f / dWidth, getHeight()\n\t\t\t\t\t\t\t* 1.0f / dHeight);\n\t\t\t\t} else\n\t\t\t\t{\n\t\t\t\t\tscale = getWidth() * 1.0F / Math.min(dWidth, dHeight);\n\t\t\t\t}\n\t\t\t\t//根据缩放比例，设置bounds，相当于缩放图片了\n\t\t\t\tdrawable.setBounds(0, 0, (int) (scale * dWidth),\n\t\t\t\t\t\t(int) (scale * dHeight));\n\t\t\t\tdrawable.draw(drawCanvas);\n\t\t\t\tif (mMaskBitmap == null || mMaskBitmap.isRecycled())\n\t\t\t\t{\n\t\t\t\t\tmMaskBitmap = getBitmap();\n\t\t\t\t}\n\t\t\t\t// Draw Bitmap.\n\t\t\t\tmPaint.reset();\n\t\t\t\tmPaint.setFilterBitmap(false);\n\t\t\t\tmPaint.setXfermode(mXfermode);\n\t\t\t\t//绘制形状\n\t\t\t\tdrawCanvas.drawBitmap(mMaskBitmap, 0, 0, mPaint);\n\t\t\t\tmPaint.setXfermode(null);\n\t\t\t\t//将准备好的bitmap绘制出来\n\t\t\t\tcanvas.drawBitmap(bitmap, 0, 0, null);\n\t\t\t\t//bitmap缓存起来，避免每次调用onDraw，分配内存\n\t\t\t\tmWeakBitmap = new WeakReference\u003cBitmap\u003e(bitmap);\n\t\t\t}\n\t\t}\n\t\t//如果bitmap还存在，则直接绘制即可\n\t\tif (bitmap != null)\n\t\t{\n\t\t\tmPaint.setXfermode(null);\n\t\t\tcanvas.drawBitmap(bitmap, 0.0f, 0.0f, mPaint);\n\t\t\treturn;\n\t\t}\n\n\t}\n\t/**\n\t * 绘制形状\n\t * @return\n\t */\n\tpublic Bitmap getBitmap()\n\t{\n\t\tBitmap bitmap = Bitmap.createBitmaps(getWidth(), getHeight(),\n\t\t\t\tConfig.ARGB_8888);\n\t\tCanvas canvas = new Canvas(bitmap);\n\t\tPaint paint = new Paint(Paint.ANTI_ALIAS_FLAG);\n\t\tpaint.setColor(Color.BLACK);\n\n\t\tif (type == TYPE_ROUND)\n\t\t{\n\t\t\tcanvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),\n\t\t\t\t\tmBorderRadius, mBorderRadius, paint);\n\t\t} else\n\t\t{\n\t\t\tcanvas.drawCircle(getWidth() / 2, getWidth() / 2, getWidth() / 2,\n\t\t\t\t\tpaint);\n\t\t}\n\n\t\treturn bitmap;\n\t}\n```\n\n    如上，代码明显性能很差，createBitmap，Bitmap的色彩用的也是ARGB_8888，内存消耗也很大，同时还频繁使用setXfermode模式，这些东西都在UI线程走，性能极差。\n为了证明traceview没骗我，我也没冤枉他，我把自定义控件改成了imageview，padding也去掉，性能确实提升了很高。\n# \n为了解决这些问题我打算用fresco去完成这些工作，fresco的老东家把android性能优化做到了极致，研究了好多年，也贡献了很多文献资料开源的东西。\n## fresco，对于圆角和圆形有两种方案\n\n\u003e- 第一种，OVERLAY_COLOR,就是正常展示一张正方形图，圆角的地方用非透明颜色绘制遮挡的方案，来完成，这种性能极高。但是，如果碰到控件背景非透明的情况，就没法用了。\n\n\u003e- 第二种，BITMAP_ONLY,原型图他是用BitmapShader来完成性能不怎样，但是fresco只能尽量帮你做到不重复创建bitmap之类的性能问题，来实现圆形或者圆角。\n    \n    fresco绝对不用xfermode方案。\n# \n## 使用SystemClock去抓取getView或者bindHolder方法之行的耗时\n\n贴出优化之前的getview中代码段的耗时，为了公平，不把LayoutInflat这行代码纪录进来。因为后面我打重构这个list之后，我用的是RecyclerView，bind方法和create方法是分开的，我要保证公平。\n![](assets/log0.png)\n明显这个旧的getView的代码已经明显出现耗时的抖动问题了，重构之后的那段`BindHolder`代码的cpu耗时标准的在2-4ms之间,后面会贴出截图。旧的代码他猛起来居然可以跑到7，其实有些地方截图没截到，还有10ms的，一个getView都10ms，那一些log看不到的地方再算下来会更加严重的，这就是为什么这个list这么卡的原因。\n# \n    android屏幕刷新频率是16ms，如果一旦UI线程繁忙超过16ms，那么就很容易被看出卡顿，当然页面静止的情况下页面卡顿的话也是很难看出来，因为卡是静止的，不卡也是静止的。但是到列表页上之后，就不同了，到了列表页，很多问题都容易被凸显出来，滚动不流畅，明显掉帧，这些都要去仔细找问题。\n# \n为了找到这段getView中cpu耗时抖动的问题，我先猜测一些第三方的东西，那就是xutils了，其次时BaseViewHolder这个查找view的代码，他内部是SparseArray，理论上来说性能也是蛮高的，所以先从xutils下手，我不能没有证据的责怪xutils，所以我再次打log在xutils那三四行代码上，不抓取其他的代码耗时。\n# \n为了保证公平，我多上下滚动几遍，等xutils把图片都缓存到内存中之后，我清掉日志，开始滚动，看到的数据是这样子。\n![](assets/log1.png)\n确实很明显，这里把计时夹在xutils的几行代码得前后，居然有两次他cpu耗时到了4，安静下来的时候也可以是0,所以，无疑这个地方xutils难逃干系。\n#  \n下面是重构方案\n\n# 重构之后\n重构之后这里圆角和圆形都使用fresco来完成这些，圆角的大图由于背景色是白色就可以用OVERLAY_COLOR，那个圆形头像背景需要透明，所以还是得BITMAP_ONLY模式。\n\n```\n    //贴出重构之后的bindHolder代码\n    @Override\n    public void onBindItemViewHolder(LiveFragholder holder, final int position) {\n\n\n        String url=getList().get(position).get(\"avatar\").toString()+\"\";\n\n        FrescoUtils.displayAvatar(holder.iv_item_recycle_host_head,url);\n        FrescoUtils.displayUrl(holder.iv_item_live_cover, getList().get(position).get(\"thumb\").toString());\n\n\n        holder.tv_live_hostname.setText(getList().get(position).get(\"nick\").toString());\n        int view = Integer.parseInt(getList().get(position).get(\"view\").toString());\n        if(view \u003e 10000){\n            BigDecimal b1 = new BigDecimal(view);\n            BigDecimal b2 = new BigDecimal(10000);\n            holder.tv_item_live_viewernum.setText(b1.divide(b2,1,BigDecimal.ROUND_HALF_UP).doubleValue()+\"W\");\n        }else{\n            holder.tv_item_live_viewernum.setText(view + \"\");\n        }\n        holder.tv_item_live_title.setText(getList().get(position).get(\"title\").toString());\n\n        final Context context=holder.iv_item_live_cover.getContext();\n        holder.iv_item_live_cover.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View view) {\n                HashMap\u003cString,String\u003e mob_map = new HashMap\u003c\u003e();\n                //因为某些圆形这里还在使用hasmap\n                mob_map.put(\"position\",position + \"\");\n                MobclickAgent.onEvent(context, UmengCollectConfig.ZB_FL,mob_map);\n                Bundle bundle = new Bundle();\n                bundle.putString(\"uid\", getList().get(position).get(\"uid\").toString());\n                Intent intent = new Intent();\n                intent.setClass(context, TheLiveActivity.class);\n                intent.putExtras(bundle);\n                context.startActivity(intent);\n            }\n        });\n    }\n\n```\n\n\n来看下优化之后的onBinderItem的全部代码，滚动过程的时traceview抓取的数据。\n![](assets/traceview4.png)\n明显看到一个点，90.2%的耗时都在Looper.loop上。这说明是正常的，上面说了ui线程只有空闲的时候才会去循环的loop。如果我的list滚动的性能不好loop的占用的百分比肯定低。\n\n\n# \n在我的`BindHoder`代码开头做一个毫秒级时间戳的记录，在结尾处也做个纪录，对比两个时间戳的差值，查看具体我在`BindHoder`中的代码耗时。\n![](assets/log2.png)\ncpu耗时标准的在2-4ms之间。非常的稳定，没有乱飘的现象。\n\n这个时间比之前得一个时间长了点，没问题的，这个是抓取全部得onBindItem得代码，上面只是截取 xutils载入图片的几行代码而已。所以这里全部的代码已经顶了原来旧的代码里面xutils的几行了。cpu耗时提升了很多很多。前面的还要前面那张耗时的log才是正确的getView里全部得代码耗时统计。\n\n-----------------\n# 简直完美！！！！对比下敌台的列表页，肉眼明显可见的敌台列表页卡顿比我们还严重，而且对方的item还比我们多了一个圆形头像的空间。终于可以拍着膀子说我们比敌台性能好。\n\n\n","lang":"cn"},"__N_SSG":true},"page":"/[lang]/blog/[slug]","query":{"lang":"cn","slug":"一次优化列表页卡顿的经历"},"buildId":"gemsgeIqO9drZBXzEf0vV","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>
