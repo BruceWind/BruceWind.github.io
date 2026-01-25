@@ -61,7 +61,7 @@ export default function LanguageSwitch({ currentLang }) {
   };
 
   return (
-    <div style={{ position: 'absolute', top: 22, right: 15, height: 100, zIndex: 1300 }}>
+    <div style={{ position: 'fixed', top: 22, right: 15, zIndex: 1300 }}>
       <MaterialUISwitch
         sx={{ m: 1 }}
         onChange={handleLanguageChange}
