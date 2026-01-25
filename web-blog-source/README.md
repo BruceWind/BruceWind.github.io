@@ -1,70 +1,105 @@
-# Getting Started with Create React App
+# Blog - Next.js Static Site
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A personal blog built with Next.js using Static Site Generation (SSG) for SEO optimization, hosted on GitHub Pages.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+- Node.js 18+
+- Yarn (recommended) or npm
 
-### `npm start`
+## Local Development
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+# Install dependencies
+yarn install
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Run development server
+yarn dev
+```
 
-### `npm test`
+Open [http://localhost:3000](http://localhost:3000) to view in your browser.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Local Build & Preview
 
-### `npm run build`
+```bash
+# Build static site (with GitHub token to avoid rate limiting)
+GITHUB_TOKEN=your_token_here yarn build
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Preview the built site
+npx serve out
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The static output is generated in the `out/` directory.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### GitHub Token Setup (Required for Local Build)
 
-### `npm run eject`
+The build fetches GitHub Gists, which requires authentication to avoid API rate limiting (403 errors).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token (classic)"
+3. Give it a name (e.g., "blog-build")
+4. Select scope: `gist` (read access to gists)
+5. Generate and copy the token
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Then use it when building:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx yarn build
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Or set it permanently in your shell profile (`~/.bashrc` or `~/.zshrc`):
 
-## Learn More
+```bash
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Automatic Publishing (GitHub Actions)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The site is automatically built and deployed when you push to the `master` branch.
 
-### Code Splitting
+### How it works:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. Push changes to `master` branch
+2. GitHub Actions workflow (`.github/workflows/production-work.yml`) triggers
+3. Workflow runs `yarn build` in `web-blog-source/`
+4. Static files from `out/` are copied to repository root
+5. Changes are committed and pushed to GitHub Pages
 
-### Analyzing the Bundle Size
+### To publish:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+git add .
+git commit -m "Your commit message"
+git push origin master
+```
 
-### Making a Progressive Web App
+The site will be live at: https://brucewind.github.io
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Project Structure
 
-### Advanced Configuration
+```
+web-blog-source/
+├── pages/
+│   ├── _app.js          # MUI ThemeProvider, dark mode
+│   ├── _document.js     # MUI SSR support
+│   ├── index.js         # Root redirect (language detection)
+│   └── [lang]/
+│       ├── index.js     # Blog list (/en/, /cn/)
+│       └── blog/[slug].js  # Blog post pages
+├── components/
+│   ├── MarkdownRenderer.js  # Markdown rendering
+│   └── LanguageSwitch.js    # Language toggle
+├── lib/
+│   ├── posts.js         # Build-time data fetching
+│   └── createEmotionCache.js
+├── styles/
+│   └── globals.css      # Global styles
+├── next.config.js       # Next.js config (static export)
+└── out/                 # Build output (static HTML)
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Content Sources
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- English posts: `../en_mds/` and `../config/en_blog_list.json`
+- Chinese posts: `../md/` and `../config/cn_blogs.json`
+- External markdown files and GitHub Gists are fetched at build time

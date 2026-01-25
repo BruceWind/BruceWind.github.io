@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Use Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: '16.x'
+        node-version: '18.x'
 
     - name: Install Dependencies
       run: cd web-blog-source && yarn install
@@ -27,7 +27,13 @@ jobs:
       run: cd web-blog-source && yarn build 
 
     - name: Copy Production
-      run: cd web-blog-source && rm -rf ../static && cp -r ./build/* ../
+      run: |
+        # Remove old build files
+        rm -rf static index.html asset-manifest.json manifest.json
+        # Copy new build from Next.js output
+        cp -r web-blog-source/out/* ./
+        # Add .nojekyll to prevent GitHub Pages from ignoring _next folder
+        touch .nojekyll
     
     - name: Configure Git
       run: |
@@ -37,5 +43,5 @@ jobs:
     - name: Commit Code
       run: |
         git add .
-        git commit -m "copy production"
+        git commit -m "Deploy Next.js static build" || echo "No changes to commit"
         git push origin master
