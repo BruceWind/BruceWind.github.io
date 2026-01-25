@@ -32,7 +32,7 @@ export default function BlogPost({ post, content, lang }) {
             <Link href={`/${lang}/`} passHref legacyBehavior>
               <Button
                 component="a"
-                startIcon={<ArrowBackIcon />}
+                startIcon={<ArrowBackIcon fontSize="small" />}
                 sx={{ marginBottom: 2 }}
               >
                 {isChineseUI ? '返回列表' : 'Back to list'}
