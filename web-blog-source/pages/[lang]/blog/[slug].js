@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -12,7 +13,11 @@ import LanguageSwitch from '../../../components/LanguageSwitch';
 import { getAllPostSlugsWithGists, getPostBySlug, fetchMarkdownContent } from '../../../lib/posts';
 
 export default function BlogPost({ post, content, lang }) {
-  const isChineseUI = lang === 'cn';
+  const router = useRouter();
+  const { from } = router.query;
+  // Use 'from' query param if present (for gists accessed from different language), otherwise use current lang
+  const backLang = from || lang;
+  const isChineseUI = backLang === 'cn';
 
   return (
     <>
@@ -29,7 +34,7 @@ export default function BlogPost({ post, content, lang }) {
           <Box sx={{ position: 'relative' }}>
             <LanguageSwitch currentLang={lang} />
             
-            <Link href={`/${lang}/`} passHref legacyBehavior>
+            <Link href={`/${backLang}/`} passHref legacyBehavior>
               <Button
                 component="a"
                 startIcon={<ArrowBackIcon fontSize="small" />}

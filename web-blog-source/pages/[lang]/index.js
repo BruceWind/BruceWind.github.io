@@ -46,11 +46,16 @@ export default function Home({ categories, lang }) {
                   <Divider />
                   {category.data.map((post, index) => {
                     // Gists are English-only, so always use /en/ for them
-                    const linkLang = category.category === 'Gists' ? 'en' : lang;
+                    const isGist = category.category === 'Gists';
+                    const linkLang = isGist ? 'en' : lang;
+                    // Pass original language as query param for gists so back button works correctly
+                    const href = isGist && lang !== 'en' 
+                      ? `/${linkLang}/blog/${post.slug}/?from=${lang}`
+                      : `/${linkLang}/blog/${post.slug}/`;
                     return (
                     <Link
                       key={`${category.category}-${index}`}
-                      href={`/${linkLang}/blog/${post.slug}/`}
+                      href={href}
                       passHref
                       legacyBehavior
                     >
