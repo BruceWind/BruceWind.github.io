@@ -44,10 +44,13 @@ export default function Home({ categories, lang }) {
                     {category.category}
                   </ListSubheader>
                   <Divider />
-                  {category.data.map((post, index) => (
+                  {category.data.map((post, index) => {
+                    // Gists are English-only, so always use /en/ for them
+                    const linkLang = category.category === 'Gists' ? 'en' : lang;
+                    return (
                     <Link
                       key={`${category.category}-${index}`}
-                      href={`/${lang}/blog/${post.slug}/`}
+                      href={`/${linkLang}/blog/${post.slug}/`}
                       passHref
                       legacyBehavior
                     >
@@ -66,7 +69,8 @@ export default function Home({ categories, lang }) {
                         />
                       </ListItemButton>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </React.Fragment>
               ))}
             </List>
